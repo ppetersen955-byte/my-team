@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ärger & Stress Navi</title>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #0b1120;
+      --accent-orange: #f97316;
+      --accent-blue: #38bdf8;
+      --accent-green: #22c55e;
+      --accent-rose: #fb7185;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --border-subtle: #1f2937;
+      --shadow-soft: 0 16px 40px rgba(0,0,0,0.5);
+      --radius-xl: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: radial-gradient(circle at top, #1e293b 0, #020617 50%, #000 100%);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text-main);
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 480px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    header {
+      text-align: center;
+      padding-top: 4px;
+    }
+
+    header h1 {
+      margin: 4px 0;
+      font-size: 22px;
+      letter-spacing: 0.03em;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .card {
+      background: linear-gradient(145deg, #020617, #020617, #0b1120);
+      border-radius: var(--radius-xl);
+      padding: 14px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 260px;
+    }
+
+    .badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.8);
+      border: 1px solid #1f2937;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent-orange);
+    }
+
+    .badge-soft {
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.5);
+      border: 1px dashed #1f2937;
+    }
+
+    .title {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .calm-phrase {
+      font-size: 12px;
+      color: var(--accent-blue);
+      margin-top: -4px;
+      margin-bottom: 4px;
+    }
+
+    .text {
+      font-size: 14px;
+      color: #e5e7eb;
+      white-space: pre-wrap;
+    }
+
+    .tile-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .tile {
+      border-radius: 14px;
+      padding: 9px 10px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid rgba(148,163,184,0.25);
+      background: radial-gradient(circle at top left, rgba(248,250,252,0.05), transparent 55%);
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      line-height: 1.3;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, border-color 0.08s ease, background 0.08s ease;
+    }
+
+    .tile span.emoji {
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: -1px;
+    }
+
+    .tile span.label {
+      flex: 1;
+    }
+
+    .tile:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+      border-color: rgba(248,250,252,0.25);
+      background: radial-gradient(circle at top left, rgba(248,250,252,0.1), transparent 55%);
+    }
+
+    .tile.orange {
+      border-color: rgba(248, 148, 48, 0.45);
+      background: radial-gradient(circle at top left, rgba(248, 148, 48, 0.15), transparent 60%);
+    }
+
+    .tile.blue {
+      border-color: rgba(56, 189, 248, 0.45);
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 60%);
+    }
+
+    .tile.green {
+      border-color: rgba(52, 211, 153, 0.45);
+      background: radial-gradient(circle at top left, rgba(52, 211, 153, 0.12), transparent 60%);
+    }
+
+    .tile.rose {
+      border-color: rgba(251, 113, 133, 0.45);
+      background: radial-gradient(circle at top left, rgba(251, 113, 133, 0.15), transparent 60%);
+    }
+
+    .summary-box {
+      margin-top: 4px;
+      padding: 8px;
+      border-radius: 12px;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid #1f2937;
+      font-size: 13px;
+      color: #e5e7eb;
+      white-space: pre-wrap;
+    }
+
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .nav-btn {
+      flex: 1;
+      border-radius: 999px;
+      padding: 8px 10px;
+      font-size: 13px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .nav-btn span.icon {
+      font-size: 14px;
+    }
+
+    .nav-btn.secondary {
+      background: rgba(15,23,42,0.9);
+      color: var(--text-muted);
+      border: 1px solid #1f2937;
+    }
+
+    .nav-btn.primary {
+      background: var(--accent-orange);
+      color: #111827;
+      font-weight: 600;
+    }
+
+    footer {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      padding-bottom: 4px;
+    }
+
+    @media (max-width: 380px) {
+      .tile-grid {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Ärger & Stress Navi</h1>
+    <p>Dein kleiner Coach: erst runterkommen, dann verstehen, dann handeln.</p>
+  </header>
+
+  <div class="card">
+    <div class="badge-row">
+      <div class="badge">
+        <div class="badge-dot"></div>
+        <span id="badge-label">Start</span>
+      </div>
+      <div class="badge-soft" id="intensity-label"></div>
+    </div>
+
+    <div class="title" id="node-title">Was fühlst du gerade?</div>
+    <div class="calm-phrase" id="calm-phrase"></div>
+    <div class="text" id="node-text"></div>
+
+    <div class="tile-grid" id="tile-grid"></div>
+
+    <div class="summary-box" id="summary-box" style="display:none;"></div>
+
+    <div class="nav-row">
+      <button class="nav-btn secondary" id="back-btn">
+        <span class="icon">←</span><span>Zurück</span>
+      </button>
+      <button class="nav-btn secondary" id="home-btn">
+        <span class="icon">🏠</span><span>Zum Start</span>
+      </button>
+    </div>
+  </div>
+
+  <footer>
+    Du musst nichts perfekt machen. Ein ehrlicher Schritt reicht für heute.
+  </footer>
+</div>
+
+<script>
+  // kleiner Zustandsspeicher für die Zusammenfassung
+  const state = {
+    emotion: null,
+    target: null,
+    trigger: null,
+    fear: null,
+    need: null,
+    intensity: null
+  };
+
+  const calmPhrases = [
+    "Du musst jetzt nicht perfekt reagieren.",
+    "Atmen reicht für den ersten Schritt.",
+    "Wut ist ein Hinweis, kein Feind.",
+    "Du darfst so fühlen, wie du dich gerade fühlst.",
+    "Nicht alles, was laut ist, gehört dir.",
+    "Du darfst kurz Pause haben – auch mitten im Chaos.",
+    "Gott ist im Raum, auch wenn du wütend bist."
+  ];
+
+  // Knoten / "Kachelschritte"
+  const nodes = {
+    start: {
+      id: "start",
+      badge: "Start",
+      title: "Was fühlst du gerade?",
+      text:
+        "Tippe auf die Kachel, die am besten beschreibt, wie es dir gerade geht. Es muss nicht perfekt passen – dein Bauchgefühl reicht.",
+      options: [
+        {
+          label: "Ich bin richtig wütend",
+          emoji: "🔥",
+          color: "orange",
+          next: "anger_target",
+          set: { emotion: "Wut", intensity: "hoch" }
+        },
+        {
+          label: "Ich bin gestresst / überfordert",
+          emoji: "⚡",
+          color: "blue",
+          next: "stress_source",
+          set: { emotion: "Stress" }
+        },
+        {
+          label: "Ich bin verletzt / enttäuscht",
+          emoji: "💔",
+          color: "rose",
+          next: "hurt_source",
+          set: { emotion: "Verletzung" }
+        },
+        {
+          label: "Ich weiß gar nicht, was los ist",
+          emoji: "🌫️",
+          color: "green",
+          next: "confused",
+          set: { emotion: "Unklarheit" }
+        }
+      ]
+    },
+
+    // Verzweigungen für Wut
+    anger_target: {
+      id: "anger_target",
+      badge: "Wut sortieren",
+      title: "Über wen ärgerst du dich am meisten?",
+      text:
+        "Manchmal sind wir gar nicht nur über eine Person wütend, sondern auch über uns selbst oder die Situation.\n\nWas fühlt sich am treffendsten an?",
+      options: [
+        {
+          label: "Über mich selbst",
+          emoji: "🪞",
+          color: "blue",
+          next: "anger_trigger",
+          set: { target: "mich selbst" }
+        },
+        {
+          label: "Über eine nahestehende Person",
+          emoji: "🤝",
+          color: "orange",
+          next: "anger_trigger",
+          set: { target: "jemand Nahes" }
+        },
+        {
+          label: "Über jemanden auf der Arbeit",
+          emoji: "🛠️",
+          color: "green",
+          next: "anger_trigger",
+          set: { target: "Arbeit / Kollege" }
+        },
+        {
+          label: "Über eine ganze Situation",
+          emoji: "🌪️",
+          color: "rose",
+          next: "anger_trigger",
+          set: { target: "Situation" }
+        }
+      ]
+    },
+
+    anger_trigger: {
+      id: "anger_trigger",
+      badge: "Wurzel der Wut",
+      title: "Was wurde in dir verletzt?",
+      text:
+        "Hinter Wut steckt fast immer etwas Tieferes. Was trifft es am besten?",
+      options: [
+        {
+          label: "Mein Respekt / meine Würde",
+          emoji: "🧱",
+          color: "orange",
+          next: "anger_fear",
+          set: { trigger: "Respekt / Würde" }
+        },
+        {
+          label: "Mein Vertrauen",
+          emoji: "🤍",
+          color: "rose",
+          next: "anger_fear",
+          set: { trigger: "Vertrauen" }
+        },
+        {
+          label: "Mein Gefühl, wichtig zu sein",
+          emoji: "👁️",
+          color: "blue",
+          next: "anger_fear",
+          set: { trigger: "Gesehen-/Wichtigkeit" }
+        },
+        {
+          label: "Mein Bedürfnis nach Ruhe / Sicherheit",
+          emoji: "🛡️",
+          color: "green",
+          next: "anger_fear",
+          set: { trigger: "Sicherheit / Ruhe" }
+        }
+      ]
+    },
+
+    anger_fear: {
+      id: "anger_fear",
+      badge: "Tiefer schauen",
+      title: "Wovor hast du eigentlich Angst?",
+      text:
+        "Wut ist oft Angst im Schutzanzug. Wenn du ehrlich bist: Wovor fürchtest du dich am meisten in dieser Situation?",
+      options: [
+        {
+          label: "Dass ich nicht wichtig bin",
+          emoji: "🙈",
+          color: "rose",
+          next: "need",
+          set: { fear: "Nicht wichtig / nicht gesehen" }
+        },
+        {
+          label: "Dass ich verlassen / abgelehnt werde",
+          emoji: "🚪",
+          color: "blue",
+          next: "need",
+          set: { fear: "Verlust / Ablehnung" }
+        },
+        {
+          label: "Dass ich versage oder nicht reiche",
+          emoji: "📉",
+          color: "orange",
+          next: "need",
+          set: { fear: "Versagen / Nicht-genug-sein" }
+        },
+        {
+          label: "Dass ich die Kontrolle verliere",
+          emoji: "🎢",
+          color: "green",
+          next: "need",
+          set: { fear: "Kontrollverlust" }
+        }
+      ]
+    },
+
+    // Stress-Strang
+    stress_source: {
+      id: "stress_source",
+      badge: "Stress klären",
+      title: "Woher kommt dein Stress hauptsächlich?",
+      text:
+        "Auch wenn vieles zusammenkommt: Was ist gerade die deutlichste Quelle für deinen Stress?",
+      options: [
+        {
+          label: "Arbeit / Verantwortung",
+          emoji: "📂",
+          color: "orange",
+          next: "need",
+          set: { trigger: "Arbeits-/Verantwortungsdruck" }
+        },
+        {
+          label: "Familie / Beziehung",
+          emoji: "🏠",
+          color: "rose",
+          next: "need",
+          set: { trigger: "Familiendruck / Beziehung" }
+        },
+        {
+          label: "Finanzen / Zukunft",
+          emoji: "💸",
+          color: "blue",
+          next: "need",
+          set: { trigger: "Sorge um Zukunft / Geld" }
+        },
+        {
+          label: "Einfach alles zu viel",
+          emoji: "🧨",
+          color: "green",
+          next: "need",
+          set: { trigger: "Überforderung / Reizüberflutung" }
+        }
+      ]
+    },
+
+    // Verletzung / Enttäuschung
+    hurt_source: {
+      id: "hurt_source",
+      badge: "Verletzung verstehen",
+      title: "Was tut dir am meisten weh?",
+      text:
+        "Wenn du in dich reinspürst: Was fühlt sich am empfindlichsten an?",
+      options: [
+        {
+          label: "Ich fühle mich nicht ernst genommen",
+          emoji: "🙃",
+          color: "blue",
+          next: "need",
+          set: { trigger: "Nicht ernst genommen" }
+        },
+        {
+          label: "Ein Versprechen wurde gebrochen",
+          emoji: "📜",
+          color: "rose",
+          next: "need",
+          set: { trigger: "Gebrochenes Vertrauen" }
+        },
+        {
+          label: "Ich fühle mich ausgenutzt",
+          emoji: "🪫",
+          color: "orange",
+          next: "need",
+          set: { trigger: "Ausgenutzt / übergangen" }
+        },
+        {
+          label: "Ich fühle mich allein gelassen",
+          emoji: "🌒",
+          color: "green",
+          next: "need",
+          set: { trigger: "Allein gelassen" }
+        }
+      ]
+    },
+
+    // Unklarheit
+    confused: {
+      id: "confused",
+      badge: "Unklarheit",
+      title: "Dann sortieren wir grob.",
+      text:
+        "Wenn du nicht genau weißt, was los ist, reicht eine grobe Richtung.\n\nWas fühlt sich am ehesten an wie deine Situation?",
+      options: [
+        {
+          label: "Mein Kopf ist voll",
+          emoji: "🧠",
+          color: "blue",
+          next: "need",
+          set: { trigger: "Gedankenkarussell" }
+        },
+        {
+          label: "Mein Herz ist schwer",
+          emoji: "💧",
+          color: "rose",
+          next: "need",
+          set: { trigger: "Schwere / Traurigkeit" }
+        },
+        {
+          label: "Ich bin dauernd gereizt",
+          emoji: "💢",
+          color: "orange",
+          next: "need",
+          set: { trigger: "Dauerreizung" }
+        },
+        {
+          label: "Ich bin einfach leer",
+          emoji: "🕳️",
+          color: "green",
+          next: "need",
+          set: { trigger: "Erschöpfung / Leere" }
+        }
+      ]
+    },
+
+    // Bedürfnis-Abfrage
+    need: {
+      id: "need",
+      badge: "Was brauchst du?",
+      title: "Was brauchst du JETZT am meisten?",
+      text:
+        "Nicht: Was erwarten die anderen. Sondern: Was würde dir helfen, wieder ein bisschen klarer zu sehen?",
+      options: [
+        {
+          label: "Eine Pause / Abstand",
+          emoji: "⏸️",
+          color: "green",
+          next: "summary",
+          set: { need: "Pause / Abstand" }
+        },
+        {
+          label: "Ein ehrliches Gespräch",
+          emoji: "💬",
+          color: "blue",
+          next: "summary",
+          set: { need: "ehrliches Gespräch" }
+        },
+        {
+          label: "Eine klare Grenze",
+          emoji: "🚧",
+          color: "orange",
+          next: "summary",
+          set: { need: "Grenze setzen" }
+        },
+        {
+          label: "Unterstützung / Hilfe",
+          emoji: "🧡",
+          color: "rose",
+          next: "summary",
+          set: { need: "Unterstützung / Hilfe" }
+        }
+      ]
+    },
+
+    // Zusammenfassung
+    summary: {
+      id: "summary",
+      badge: "Dein Klarheits-Satz",
+      title: "Das ist gerade in dir los:",
+      text:
+        "Das hier ist kein Urteil – nur ein Spiegel. Du kannst ihn auch jederzeit wieder ändern.",
+      options: [
+        {
+          label: "Nochmal von vorne starten",
+          emoji: "🔁",
+          color: "blue",
+          next: "start",
+          set: {}
+        },
+        {
+          label: "Nur kurz atmen & schließen",
+          emoji: "🌙",
+          color: "green",
+          next: "start",
+          set: {}
+        }
+      ]
+    }
+  };
+
+  const badgeLabelEl = document.getElementById("badge-label");
+  const intensityLabelEl = document.getElementById("intensity-label");
+  const titleEl = document.getElementById("node-title");
+  const textEl = document.getElementById("node-text");
+  const phraseEl = document.getElementById("calm-phrase");
+  const gridEl = document.getElementById("tile-grid");
+  const summaryBoxEl = document.getElementById("summary-box");
+  const backBtn = document.getElementById("back-btn");
+  const homeBtn = document.getElementById("home-btn");
+
+  let history = [];
+  let currentNodeId = "start";
+
+  function pickRandom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function applySet(set) {
+    if (!set) return;
+    Object.assign(state, set);
+  }
+
+  function buildSummaryText() {
+    const lines = [];
+
+    if (state.emotion) {
+      lines.push(`Ich spüre gerade vor allem: ${state.emotion}.`);
+    }
+
+    if (state.target) {
+      lines.push(`Mein Ärger richtet sich vor allem gegen: ${state.target}.`);
+    }
+
+    if (state.trigger) {
+      lines.push(`Tiefer dahinter liegt: ${state.trigger}.`);
+    }
+
+    if (state.fear) {
+      lines.push(`Die eigentliche Angst dahinter ist: ${state.fear}.`);
+    }
+
+    if (state.need) {
+      lines.push(`Was ich jetzt am meisten brauche: ${state.need}.`);
+    }
+
+    if (!lines.length) {
+      lines.push("Du hast gerade etwas Wichtiges gespürt. Das allein ist schon ein Schritt.");
+    }
+
+    lines.push("\nDu musst darauf nicht perfekt reagieren. Ein kleiner, ehrlicher Schritt reicht.");
+
+    return lines.join("\n");
+  }
+
+  function renderNode(id, pushHistory = true) {
+    const node = nodes[id] || nodes.start;
+    currentNodeId = node.id;
+
+    if (pushHistory && history[history.length - 1] !== id) {
+      history.push(id);
+    }
+
+    badgeLabelEl.textContent = node.badge || "Schritt";
+    intensityLabelEl.textContent = state.intensity
+      ? `Intensität: ${state.intensity}`
+      : "";
+
+    titleEl.textContent = node.title;
+    textEl.textContent = node.text || "";
+    phraseEl.textContent = pickRandom(calmPhrases);
+
+    gridEl.innerHTML = "";
+    summaryBoxEl.style.display = node.id === "summary" ? "block" : "none";
+
+    if (node.id === "summary") {
+      summaryBoxEl.textContent = buildSummaryText();
+    }
+
+    (node.options || []).forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "tile " + (opt.color || "");
+      btn.innerHTML = `
+        <span class="emoji">${opt.emoji || "🪫"}</span>
+        <span class="label">${opt.label}</span>
+      `;
+      btn.addEventListener("click", () => {
+        applySet(opt.set);
+        if (opt.next) {
+          renderNode(opt.next, true);
+        }
+      });
+      gridEl.appendChild(btn);
+    });
+
+    backBtn.disabled = history.length <= 1;
+    backBtn.style.opacity = history.length <= 1 ? 0.4 : 1;
+  }
+
+  backBtn.addEventListener("click", () => {
+    if (history.length > 1) {
+      history.pop();
+      const prevId = history[history.length - 1];
+      renderNode(prevId, false);
+    }
+  });
+
+  homeBtn.addEventListener("click", () => {
+    history = [];
+    for (const key in state) {
+      state[key] = null;
+    }
+    renderNode("start", true);
+  });
+
+  // Start
+  renderNode("start", true);
+</script>
+</body>
+</html>
