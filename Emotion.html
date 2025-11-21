@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Emotions-Navi mit Bibelvers</title>
+  <title>Emotionen & Bibel-Navi</title>
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -11,14 +11,15 @@
   <style>
     :root {
       --bg: #020617;
-      --card: #020617;
-      --accent-main: #38bdf8;  /* sanftes Blau */
-      --accent-soft: #22c55e;  /* weiches Grün */
+      --card: #0b1120;
+      --accent-orange: #f97316;
+      --accent-blue: #38bdf8;
+      --accent-green: #22c55e;
       --accent-rose: #fb7185;
       --text-main: #f9fafb;
       --text-muted: #9ca3af;
       --border-subtle: #1f2937;
-      --shadow-soft: 0 18px 40px rgba(0,0,0,0.6);
+      --shadow-soft: 0 16px 40px rgba(0,0,0,0.5);
       --radius-xl: 18px;
     }
 
@@ -30,8 +31,7 @@
       margin: 0;
       padding: 0;
       height: 100%;
-      background:
-        radial-gradient(circle at top, #0f172a 0, #020617 50%, #000 100%);
+      background: radial-gradient(circle at top, #1e293b 0, #020617 50%, #000 100%);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--text-main);
       -webkit-text-size-adjust: 100%;
@@ -70,10 +70,7 @@
     }
 
     .card {
-      background:
-        radial-gradient(circle at top left, rgba(56,189,248,0.1), transparent 55%),
-        radial-gradient(circle at bottom right, rgba(34,197,94,0.06), transparent 55%),
-        #020617;
+      background: linear-gradient(145deg, #020617, #020617, #0b1120);
       border-radius: var(--radius-xl);
       padding: 14px;
       box-shadow: var(--shadow-soft);
@@ -81,7 +78,7 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      min-height: 280px;
+      min-height: 260px;
     }
 
     .badge-row {
@@ -99,7 +96,7 @@
       gap: 4px;
       padding: 3px 8px;
       border-radius: 999px;
-      background: rgba(15,23,42,0.85);
+      background: rgba(15,23,42,0.8);
       border: 1px solid #1f2937;
     }
 
@@ -107,7 +104,7 @@
       width: 6px;
       height: 6px;
       border-radius: 999px;
-      background: var(--accent-main);
+      background: var(--accent-rose);
     }
 
     .badge-soft {
@@ -118,13 +115,13 @@
     }
 
     .title {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 600;
     }
 
     .calm-phrase {
       font-size: 12px;
-      color: var(--accent-main);
+      color: var(--accent-blue);
       margin-top: -4px;
       margin-bottom: 4px;
     }
@@ -147,21 +144,17 @@
       padding: 9px 10px;
       font-size: 13px;
       font-weight: 500;
-      border: 1px solid rgba(148,163,184,0.35);
-      background:
-        radial-gradient(circle at top left, rgba(148,163,184,0.15), transparent 60%);
+      border: 1px solid rgba(148,163,184,0.25);
+      background: radial-gradient(circle at top left, rgba(248,250,252,0.05), transparent 55%);
       color: var(--text-main);
       cursor: pointer;
       display: flex;
       align-items: flex-start;
       gap: 6px;
       line-height: 1.3;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.45);
-      transition:
-        transform 0.08s ease,
-        box-shadow 0.08s ease,
-        border-color 0.08s ease,
-        background 0.08s ease;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+      transition: transform 0.08s ease, box-shadow 0.08s ease,
+                  border-color 0.08s ease, background 0.08s ease, opacity 0.08s ease;
     }
 
     .tile span.emoji {
@@ -178,28 +171,42 @@
       transform: translateY(1px) scale(0.99);
       box-shadow: 0 3px 10px rgba(0,0,0,0.4);
       border-color: rgba(248,250,252,0.25);
+      background: radial-gradient(circle at top left, rgba(248,250,252,0.1), transparent 55%);
+    }
+
+    .tile.orange {
+      border-color: rgba(248, 148, 48, 0.45);
+      background: radial-gradient(circle at top left, rgba(248, 148, 48, 0.18), transparent 60%);
+    }
+
+    .tile.blue {
+      border-color: rgba(56, 189, 248, 0.45);
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 60%);
+    }
+
+    .tile.green {
+      border-color: rgba(52, 211, 153, 0.45);
+      background: radial-gradient(circle at top left, rgba(52, 211, 153, 0.14), transparent 60%);
+    }
+
+    .tile.rose {
+      border-color: rgba(251, 113, 133, 0.45);
+      background: radial-gradient(circle at top left, rgba(251, 113, 133, 0.18), transparent 60%);
     }
 
     .tile.selected {
-      border-color: rgba(56,189,248,0.9);
-      background:
-        radial-gradient(circle at top left, rgba(56,189,248,0.25), transparent 65%);
-      box-shadow: 0 10px 26px rgba(56,189,248,0.35);
+      outline: 2px solid #f97316;
+      outline-offset: 1px;
+      opacity: 1;
     }
 
-    .tile.cause {
-      border-color: rgba(52,211,153,0.65);
-      background:
-        radial-gradient(circle at top left, rgba(52,211,153,0.23), transparent 65%);
+    .hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
     }
 
-    .tile.action {
-      border-color: rgba(248,250,252,0.35);
-      background:
-        radial-gradient(circle at top left, rgba(148,163,184,0.2), transparent 60%);
-    }
-
-    .summary-box {
+    .verse-box {
       margin-top: 4px;
       padding: 8px;
       border-radius: 12px;
@@ -210,37 +217,22 @@
       white-space: pre-wrap;
     }
 
-    .hint {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-
-    .verse-box {
-      margin-top: 6px;
-      padding: 10px;
-      border-radius: 14px;
-      border: 1px solid rgba(56,189,248,0.5);
-      background:
-        radial-gradient(circle at top left, rgba(56,189,248,0.16), transparent 60%);
-      font-size: 13px;
-    }
-
     .verse-ref {
-      font-weight: 600;
-      color: var(--accent-main);
-      margin-bottom: 4px;
+      font-size: 12px;
+      color: var(--accent-rose);
+      margin-bottom: 2px;
     }
 
     .verse-text {
       font-size: 13px;
+      margin-bottom: 6px;
     }
 
     .nav-row {
       display: flex;
       justify-content: space-between;
       gap: 8px;
-      margin-top: 8px;
+      margin-top: 6px;
     }
 
     .nav-btn {
@@ -254,7 +246,6 @@
       align-items: center;
       justify-content: center;
       gap: 4px;
-      transition: opacity 0.1s ease, transform 0.08s ease;
     }
 
     .nav-btn span.icon {
@@ -268,19 +259,9 @@
     }
 
     .nav-btn.primary {
-      background: var(--accent-main);
-      color: #020617;
+      background: var(--accent-orange);
+      color: #111827;
       font-weight: 600;
-    }
-
-    .nav-btn:disabled {
-      opacity: 0.4;
-      cursor: default;
-    }
-
-    .nav-btn.primary:active:not(:disabled),
-    .nav-btn.secondary:active:not(:disabled) {
-      transform: translateY(1px) scale(0.99);
     }
 
     footer {
@@ -300,533 +281,326 @@
 <body>
 <div class="app">
   <header>
-    <h1>Emotions-Navi</h1>
-    <p>Eine ruhige Reise durch deine Gefühle – mit Gott an deiner Seite.</p>
+    <h1>Emotionen & Bibel</h1>
+    <p>Benenn, was du fühlst – und lass dich vom Wort Gottes stärken.</p>
   </header>
 
   <div class="card">
     <div class="badge-row">
       <div class="badge">
         <div class="badge-dot"></div>
-        <span id="badge-label">Schritt 1 von 8</span>
+        <span id="badge-label">Schritt 1 · Auswahl</span>
       </div>
-      <div class="badge-soft" id="step-label"></div>
+      <div class="badge-soft" id="secondary-label"></div>
     </div>
 
-    <div class="title" id="title">Welche Emotion ist gerade da?</div>
+    <div class="title" id="title">Welche Emotionen spürst du gerade?</div>
     <div class="calm-phrase" id="calm-phrase"></div>
-    <div class="text" id="text"></div>
+    <div class="text" id="description"></div>
 
     <div class="tile-grid" id="tile-grid"></div>
-
     <div class="hint" id="hint"></div>
 
     <div class="verse-box" id="verse-box" style="display:none;">
       <div class="verse-ref" id="verse-ref"></div>
       <div class="verse-text" id="verse-text"></div>
+      <div class="text" id="verse-expl"></div>
     </div>
-
-    <div class="summary-box" id="summary-box" style="display:none;"></div>
 
     <div class="nav-row">
       <button class="nav-btn secondary" id="back-btn">
         <span class="icon">←</span><span>Zurück</span>
       </button>
       <button class="nav-btn primary" id="next-btn">
-        <span id="next-label">Weiter</span><span class="icon">→</span>
+        <span class="icon">➡️</span><span id="next-label">Weiter</span>
       </button>
     </div>
   </div>
 
   <footer>
-    Du musst nichts perfekt machen. Ehrliche 2–3 Minuten mit dir selbst sind genug.
+    Du musst nicht alles im Griff haben. Es reicht, wenn du ehrlich bist – Gott sieht dein Herz.
   </footer>
 </div>
 
 <script>
+  const calmPhrases = [
+    "Du musst jetzt nichts leisten – du darfst einfach nur da sein.",
+    "Gott ist nicht überrascht von deinen Gefühlen.",
+    "Dein Herz darf ehrlich sein, auch wenn es chaotisch ist.",
+    "Wut, Trauer, Angst – nichts davon trennt dich von Gottes Liebe.",
+    "Ein tiefer Atemzug ist auch ein Gebet: „Herr, hilf mir.“",
+    "Du musst heute nicht perfekt reagieren. Echt reicht.",
+    "Selbst im Sturm sieht Gott dich klarer als du dich selbst."
+  ];
+
+  const EMOTIONS = [
+    {
+      id: "wut",
+      label: "Wut / Ärger",
+      emoji: "🔥",
+      color: "orange",
+      verseRef: "Epheser 4,26",
+      verseText: "Zürnt ihr, so sündigt nicht; die Sonne gehe nicht unter über eurem Zorn.",
+      expl: "Gott sagt nicht: „Du darfst nie wütend sein.“ Er nimmt deine Wut ernst. Aber er lädt dich ein, sie nicht in dir festzuhalten, bis sie dich oder andere zerstört. Deine Wut zeigt, dass dir etwas wichtig ist – Respekt, Gerechtigkeit, Nähe. Du darfst damit zu ihm kommen, bevor du Menschen verletzt oder dich selbst kaputt machst. Du musst das nicht allein ordnen. Du darfst sagen: „Herr, du siehst, wie es in mir kocht. Hilf mir, wahr zu reden, ohne zu verletzen.“"
+    },
+    {
+      id: "angst",
+      label: "Angst / Unsicherheit",
+      emoji: "😰",
+      color: "blue",
+      verseRef: "Jesaja 41,10",
+      verseText: "Fürchte dich nicht, denn ich bin mit dir; weiche nicht, denn ich bin dein Gott.",
+      expl: "Angst ist kein Zeichen, dass du zu wenig glaubst. Angst zeigt, wie verletzlich du bist. Gott macht dir keine Vorwürfe – er verspricht Nähe. Er sagt nicht: „Reiß dich zusammen“, sondern: „Ich bin mit dir.“ Vielleicht ändert er nicht sofort die Situation, aber er trägt dich mitten hindurch. Du darfst ängstlich und gleichzeitig gehalten sein. Deine Angst ist bei ihm nicht zu viel."
+    },
+    {
+      id: "traurigkeit",
+      label: "Traurigkeit",
+      emoji: "😢",
+      color: "rose",
+      verseRef: "Psalm 34,19",
+      verseText: "Der HERR ist nahe denen, die zerbrochenen Herzens sind.",
+      expl: "Traurigkeit heißt: Etwas in dir nimmt ernst, was du verloren hast oder nie hattest. Gott läuft an deiner Trauer nicht vorbei. Er setzt sich innerlich neben dich. Du musst sie nicht runterdrücken, um „stark“ zu sein. Tränen sind bei ihm kein Versagen, sondern Wahrheit. Er sieht jedes Stück deines gebrochenen Herzens – und er schämt sich nicht für dich."
+    },
+    {
+      id: "ueberfordert",
+      label: "Überforderung",
+      emoji: "🧠",
+      color: "green",
+      verseRef: "Matthäus 11,28",
+      verseText: "Kommt her zu mir, alle, die ihr mühselig und beladen seid; ich will euch erquicken.",
+      expl: "Überfordert zu sein heißt nicht, dass du versagt hast. Es heißt oft, dass du zu lange zu viel getragen hast. Jesus lädt gerade die Müden ein – nicht die Souveränen. Du musst nicht jede Erwartung erfüllen. Du darfst „zu viel“ spüren und damit zu ihm kommen. Vielleicht ist sein erster Schritt nicht: „Mach weiter“, sondern: „Leg ab, atme, ich bin da.“"
+    },
+    {
+      id: "scham",
+      label: "Scham / Schuldgefühle",
+      emoji: "🙈",
+      color: "blue",
+      verseRef: "Römer 8,1",
+      verseText: "So gibt es nun keine Verdammnis für die, die in Christus Jesus sind.",
+      expl: "Scham flüstert dir: „Mit dir stimmt etwas nicht. Du bist falsch.“ Gott trennt aber klar zwischen dem, was du getan hast, und dem, wer du bist. Er sieht deine Fehler genauer als du – und trotzdem spricht er keine Verdammnis über dich, wenn du zu Jesus gehörst. Du darfst deine Schuld benennen, aber du musst dich nicht mehr selber verurteilen. Seine Stimme ist tiefer als dein innerer Ankläger."
+    },
+    {
+      id: "einsam",
+      label: "Einsamkeit",
+      emoji: "🌒",
+      color: "rose",
+      verseRef: "Psalm 27,10",
+      verseText: "Wenn Vater und Mutter mich verlassen, so nimmt doch der HERR mich auf.",
+      expl: "Einsamkeit ist brutal, weil sie dir sagt: „Ich bin unwichtig. Keiner sieht mich.“ Gott widerspricht dieser Lüge. Selbst wenn Menschen dich übersehen oder verlassen haben – er tut es nicht. Er ist nicht nur theoretisch da, sondern persönlich interessiert an dir. Du darfst ihm sagen: „Ich fühle mich allein“, ohne dass er dich abwertet. Bei ihm bist du gewollt, nicht geduldet."
+    },
+    {
+      id: "enttaeuschung",
+      label: "Enttäuschung",
+      emoji: "💔",
+      color: "orange",
+      verseRef: "Sprüche 13,12",
+      verseText: "Hingezogene Hoffnung macht das Herz krank.",
+      expl: "Enttäuschung zeigt, dass du gehofft hast. Dass du geglaubt hast, etwas könnte schön, heil oder anders werden. Gott macht dieses Hoffen nicht lächerlich. Er kennt dein krankes Herz, das müde geworden ist. Bei ihm darfst du ehrlich sagen: „Ich hatte mir mehr erhofft.“ Er nimmt deine Erwartungen ernst – und er bleibt auch dann, wenn Menschen sie nicht erfüllt haben."
+    }
+  ];
+
   const state = {
-    step: 1,
-    emotions: [],
-    mainEmotion: null,
-    cause: null,
-    actions: []
+    screen: "select", // "select" | "intensity" | "result"
+    selectedIds: [],
+    activeEmotionId: null
   };
 
-  const calmPhrases = [
-    "Du musst jetzt nichts leisten. Atmen reicht.",
-    "Gott kennt jedes Gefühl in dir – auch die, die du kaum benennen kannst.",
-    "Gefühle sind Informationen, keine Feinde.",
-    "Du darfst so fühlen, wie du dich gerade fühlst.",
-    "Nicht alles, was laut in dir ist, gehört dir für immer.",
-    "Du bist gerade nicht allein – auch wenn es sich so anfühlt."
-  ];
-
-  const emotionOptions = [
-    { id: "wuetend",      label: "Wütend",       emoji: "😡" },
-    { id: "genervt",      label: "Genervt",      emoji: "😤" },
-    { id: "reizbar",      label: "Reizbar",      emoji: "💢" },
-    { id: "traurig",      label: "Traurig",      emoji: "😢" },
-    { id: "enttaeuscht",  label: "Enttäuscht",   emoji: "😞" },
-    { id: "einsam",       label: "Einsam",       emoji: "🌑" },
-    { id: "aengstlich",   label: "Ängstlich",    emoji: "😰" },
-    { id: "unsicher",     label: "Unsicher",     emoji: "🤔" },
-    { id: "schuldig",     label: "Schuldig",     emoji: "😔" },
-    { id: "schaemend",    label: "Beschämt",     emoji: "😳" },
-    { id: "ueberfordert", label: "Überfordert",  emoji: "😵" },
-    { id: "leer",         label: "Leer",         emoji: "🕳️" },
-    { id: "hoffnungslos", label: "Hoffnungslos", emoji: "🕯️" },
-    { id: "nervoes",      label: "Nervös",       emoji: "😬" },
-    { id: "kontrollverlust", label: "Kontrollverlust", emoji: "🎢" },
-    { id: "innerlich_unruhig", label: "Innerlich unruhig", emoji: "🌊" }
-  ];
-
-  const causeOptions = [
-    {
-      id: "kindheit",
-      label: "Kindheit / frühe Erfahrungen",
-      emoji: "🧒"
-    },
-    {
-      id: "verletzung_menschen",
-      label: "Verletzung durch andere Menschen",
-      emoji: "💔"
-    },
-    {
-      id: "konflikt_aktuell",
-      label: "Streit oder Konflikt jetzt gerade",
-      emoji: "💥"
-    },
-    {
-      id: "ueberforderung",
-      label: "Zu viel Verantwortung / Aufgaben",
-      emoji: "📦"
-    },
-    {
-      id: "angst_zukunft",
-      label: "Sorge um Zukunft / Versorgung",
-      emoji: "📅"
-    },
-    {
-      id: "unbekannt",
-      label: "Ich weiß nicht genau warum",
-      emoji: "🌫️"
-    }
-  ];
-
-  const actionOptions = [
-    { id: "aufschreiben", label: "Gedanken aufschreiben", emoji: "✍️" },
-    { id: "reden", label: "Mit einer vertrauten Person reden", emoji: "🗣️" },
-    { id: "pause", label: "5 Minuten bewusste Pause machen", emoji: "☕" },
-    { id: "beten", label: "Mit Gott darüber reden", emoji: "🙏" },
-    { id: "grenze", label: "Eine liebevolle Grenze setzen", emoji: "🚧" },
-    { id: "spazieren", label: "Kurz rausgehen / spazieren", emoji: "🚶" },
-    { id: "atmen", label: "Drei ruhige Atemzüge nehmen", emoji: "🌬️" },
-    { id: "musik", label: "Eine ruhige Playlist anmachen", emoji: "🎧" }
-  ];
-
-  const verseBox = document.getElementById("verse-box");
-  const verseRefEl = document.getElementById("verse-ref");
-  const verseTextEl = document.getElementById("verse-text");
-
-  function getVerseForCause(causeId) {
-    switch (causeId) {
-      case "kindheit":
-        return {
-          ref: "Psalm 34,19",
-          text: "Gott ist denen nahe, deren Herz zerbrochen ist. Er übersieht deine alten Wunden nicht."
-        };
-      case "verletzung_menschen":
-        return {
-          ref: "Psalm 147,3",
-          text: "Gott heilt zerbrochene Herzen und verbindet ihre Wunden – auch deine."
-        };
-      case "konflikt_aktuell":
-        return {
-          ref: "Jakobus 1,19",
-          text: "Gott lädt dich ein, zuerst zu hören, dann zu reden – und nicht aus der Wut heraus zu handeln."
-        };
-      case "ueberforderung":
-        return {
-          ref: "Matthäus 11,28",
-          text: "Jesus ruft die Müden zu sich. Du darfst deine Last bei ihm ablegen – du musst sie nicht allein tragen."
-        };
-      case "angst_zukunft":
-        return {
-          ref: "Jesaja 41,10",
-          text: "Fürchte dich nicht, denn Gott ist bei dir. Er hält dich fest, auch wenn du die Zukunft nicht im Griff hast."
-        };
-      case "unbekannt":
-      default:
-        return {
-          ref: "Römer 8,26",
-          text: "Selbst wenn dir die Worte fehlen, weiß Gott, was in dir ist. Er versteht dein Seufzen."
-        };
-    }
-  }
-
-  const badgeEl = document.getElementById("badge-label");
-  const stepLabelEl = document.getElementById("step-label");
+  const badgeLabelEl = document.getElementById("badge-label");
+  const secondaryLabelEl = document.getElementById("secondary-label");
   const titleEl = document.getElementById("title");
-  const textEl = document.getElementById("text");
-  const phraseEl = document.getElementById("calm-phrase");
+  const descEl = document.getElementById("description");
+  const calmEl = document.getElementById("calm-phrase");
   const gridEl = document.getElementById("tile-grid");
   const hintEl = document.getElementById("hint");
-  const summaryBoxEl = document.getElementById("summary-box");
+  const verseBoxEl = document.getElementById("verse-box");
+  const verseRefEl = document.getElementById("verse-ref");
+  const verseTextEl = document.getElementById("verse-text");
+  const verseExplEl = document.getElementById("verse-expl");
   const backBtn = document.getElementById("back-btn");
   const nextBtn = document.getElementById("next-btn");
-  const nextLabel = document.getElementById("next-label");
+  const nextLabelEl = document.getElementById("next-label");
 
-  function pickRandom(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
+  function randomPhrase() {
+    return calmPhrases[Math.floor(Math.random() * calmPhrases.length)];
   }
 
-  function setStep(step) {
-    state.step = step;
-    render();
+  function getEmotionById(id) {
+    return EMOTIONS.find(e => e.id === id) || null;
   }
 
   function render() {
-    const step = state.step;
-    badgeEl.textContent = `Schritt ${step} von 8`;
-    phraseEl.textContent = pickRandom(calmPhrases);
+    calmEl.textContent = randomPhrase();
     gridEl.innerHTML = "";
+    verseBoxEl.style.display = "none";
     hintEl.textContent = "";
-    verseBox.style.display = "none";
-    summaryBoxEl.style.display = "none";
+    secondaryLabelEl.textContent = "";
 
-    backBtn.disabled = step === 1;
-    nextBtn.disabled = false;
-    nextLabel.textContent = (step === 8) ? "Neu starten" : "Weiter";
+    if (state.screen === "select") {
+      badgeLabelEl.textContent = "Schritt 1 · Auswahl";
+      titleEl.textContent = "Welche Emotionen spürst du gerade?";
+      descEl.textContent =
+        "Tippe auf die Kacheln, die zu deinem Inneren passen. Du kannst bis zu drei auswählen. Es muss nicht perfekt sein – dein Gefühl reicht.";
+      nextLabelEl.textContent = "Weiter";
+      backBtn.disabled = true;
+      backBtn.style.opacity = 0.4;
 
-    if (step === 1) {
-      stepLabelEl.textContent = "Ankommen";
-      titleEl.textContent = "Welche Emotion ist gerade da?";
-      textEl.textContent =
-        "Du musst jetzt nichts erklären, nichts beweisen, nichts leisten.\n\n" +
-        "Gleich kannst du auswählen, was du fühlst. Es geht nicht darum, ob das \"logisch\" ist – " +
-        "sondern darum, ehrlich mit dir zu sein.";
-      hintEl.textContent = "Wenn du bereit bist, tippe auf „Weiter“.";
-
-    } else if (step === 2) {
-      stepLabelEl.textContent = "Gefühle sammeln";
-      titleEl.textContent = "Was fühlst du gerade?";
-      textEl.textContent =
-        "Tippe alle Emotionen an, die gerade in dir da sind. Maximal drei.\n" +
-        "Du kannst eine Emotion durch erneutes Tippen wieder abwählen.";
-
-      emotionOptions.forEach(opt => {
+      EMOTIONS.forEach((emo) => {
         const btn = document.createElement("button");
-        btn.className = "tile";
-        if (state.emotions.includes(opt.id)) {
-          btn.classList.add("selected");
-        }
+        const isSelected = state.selectedIds.includes(emo.id);
+        btn.className = "tile " + emo.color + (isSelected ? " selected" : "");
         btn.innerHTML = `
-          <span class="emoji">${opt.emoji}</span>
-          <span class="label">${opt.label}</span>
+          <span class="emoji">${emo.emoji}</span>
+          <span class="label">${emo.label}</span>
         `;
-        btn.addEventListener("click", () => toggleEmotion(opt.id));
+        btn.addEventListener("click", () => {
+          toggleEmotion(emo.id);
+        });
         gridEl.appendChild(btn);
       });
 
-      const count = state.emotions.length;
-      hintEl.textContent = `Ausgewählte Emotionen: ${count} von 3`;
-      nextBtn.disabled = count === 0;
+      hintEl.textContent = "Du kannst 1–3 Emotionen wählen. Danach unten auf „Weiter“ tippen.";
+      verseBoxEl.style.display = "none";
 
-    } else if (step === 3) {
-      stepLabelEl.textContent = "Fokus setzen";
-      const count = state.emotions.length;
-      const names = state.emotions
-        .map(id => emotionOptions.find(o => o.id === id)?.label)
-        .filter(Boolean)
-        .join(", ");
+    } else if (state.screen === "intensity") {
+      badgeLabelEl.textContent = "Schritt 2 · Gewichtung";
+      titleEl.textContent = "Welche davon fühlt sich gerade am intensivsten an?";
+      descEl.textContent =
+        "Manchmal sind mehrere Gefühle da. Wähle die Emotion, die gerade am deutlichsten in dir schreit.";
+      nextLabelEl.textContent = "Weiter";
+      backBtn.disabled = false;
+      backBtn.style.opacity = 1;
 
-      titleEl.textContent = "Welche Emotion ist am stärksten?";
-      textEl.textContent =
-        `Du hast ${count} Emotion${count > 1 ? "en" : ""} ausgewählt:\n${names}.\n\n` +
-        "Welche davon fühlt sich gerade am intensivsten an?";
+      const selected = state.selectedIds.map(getEmotionById).filter(Boolean);
+      secondaryLabelEl.textContent = `${selected.length} ausgewählt`;
 
-      state.emotions.forEach(id => {
-        const opt = emotionOptions.find(o => o.id === id);
-        if (!opt) return;
+      selected.forEach((emo) => {
         const btn = document.createElement("button");
-        btn.className = "tile";
-        if (state.mainEmotion === id) {
-          btn.classList.add("selected");
-        }
+        const isActive = state.activeEmotionId === emo.id;
+        btn.className = "tile " + emo.color + (isActive ? " selected" : "");
         btn.innerHTML = `
-          <span class="emoji">${opt.emoji}</span>
-          <span class="label">${opt.label}</span>
+          <span class="emoji">${emo.emoji}</span>
+          <span class="label">${emo.label}</span>
         `;
         btn.addEventListener("click", () => {
-          state.mainEmotion = id;
+          state.activeEmotionId = emo.id;
           render();
         });
         gridEl.appendChild(btn);
       });
 
-      nextBtn.disabled = !state.mainEmotion;
-      hintEl.textContent = "Wähle die Emotion, die am lautesten in dir ist.";
+      hintEl.textContent = "Tippe die Emotion an, die sich im Moment am stärksten anfühlt.";
+      verseBoxEl.style.display = "none";
 
-    } else if (step === 4) {
-      stepLabelEl.textContent = "Ursache spüren";
-      const mainName = getEmotionName(state.mainEmotion) || "deine Emotion";
-      titleEl.textContent = `Worum geht es tief in deiner ${mainName}?`;
-      textEl.textContent =
-        "Manchmal steckt hinter einem starken Gefühl eine tiefere Wurzel.\n\n" +
-        "Wähle die Option, die sich am ehesten richtig anfühlt – auch wenn sie nur ungefähr passt.";
+    } else if (state.screen === "result") {
+      const emo = getEmotionById(state.activeEmotionId);
+      badgeLabelEl.textContent = "Schritt 3 · Zuspruch";
+      backBtn.disabled = false;
+      backBtn.style.opacity = 1;
+      nextLabelEl.textContent = "Neue Auswahl";
 
-      causeOptions.forEach(opt => {
-        const btn = document.createElement("button");
-        btn.className = "tile cause";
-        if (state.cause === opt.id) {
-          btn.classList.add("selected");
-        }
-        btn.innerHTML = `
-          <span class="emoji">${opt.emoji}</span>
-          <span class="label">${opt.label}</span>
-        `;
-        btn.addEventListener("click", () => {
-          state.cause = opt.id;
-          render();
-        });
-        gridEl.appendChild(btn);
-      });
+      if (!emo) {
+        titleEl.textContent = "Etwas ist schiefgelaufen.";
+        descEl.textContent = "Geh bitte zurück und wähle deine Emotionen noch einmal aus.";
+        verseBoxEl.style.display = "none";
+        return;
+      }
 
-      nextBtn.disabled = !state.cause;
-      hintEl.textContent = "Du kannst das später jederzeit anders sehen – das hier ist nur ein erster Blick.";
+      // Text abhängig davon, ob nur 1 oder mehrere Emotionen gewählt wurden
+      if (state.selectedIds.length === 1) {
+        titleEl.textContent = "Du hast diese Emotion gewählt:";
+        descEl.textContent =
+          `„${emo.label}“ – wir schauen jetzt, was Gott dir genau in diesem Gefühl sagen möchte.`;
+      } else {
+        titleEl.textContent = "Diese Emotion steht gerade im Vordergrund:";
+        descEl.textContent =
+          `„${emo.label}“ – mitten in diesem Gefühl möchte Gott dir begegnen und zu deinem Herzen sprechen.`;
+      }
 
-    } else if (step === 5) {
-      stepLabelEl.textContent = "Ermutigung";
-      const mainName = getEmotionName(state.mainEmotion) || "deine Emotion";
-      titleEl.textContent = "Dein Gefühl macht Sinn.";
-      textEl.textContent = getCauseText(mainName, state.cause);
-      hintEl.textContent = "Lies dir das in Ruhe durch. Du musst nichts tun – nur aufnehmen.";
+      verseBoxEl.style.display = "block";
+      verseRefEl.textContent = emo.verseRef;
+      verseTextEl.textContent = emo.verseText;
+      verseExplEl.textContent = emo.expl;
 
-    } else if (step === 6) {
-      stepLabelEl.textContent = "Bibelvers";
-      const verse = getVerseForCause(state.cause);
-      const mainName = getEmotionName(state.mainEmotion) || "dein Gefühl";
-
-      titleEl.textContent = "Ein Vers nur für diesen Moment";
-      textEl.textContent =
-        "Gott ist nicht überrascht von " + mainName.toLowerCase() + " in dir.\n\n" +
-        "Dieser Vers soll dich nicht belehren, sondern dich erinnern: Du bist gesehen.";
-
-      verseBox.style.display = "block";
-      verseRefEl.textContent = verse.ref;
-      verseTextEl.textContent = verse.text;
-
-      hintEl.textContent = "Wenn du willst, kannst du den Vers langsam einmal laut lesen.";
-
-    } else if (step === 7) {
-      stepLabelEl.textContent = "Nächste Schritte";
-      titleEl.textContent = "Wie willst du jetzt gut für dich sorgen?";
-      textEl.textContent =
-        "Wähle ein oder mehrere Schritte, die sich gerade machbar anfühlen.\n" +
-        "Sie müssen nicht groß sein. Kleine, ehrliche Schritte sind stark.";
-
-      actionOptions.forEach(opt => {
-        const btn = document.createElement("button");
-        btn.className = "tile action";
-        if (state.actions.includes(opt.id)) {
-          btn.classList.add("selected");
-        }
-        btn.innerHTML = `
-          <span class="emoji">${opt.emoji}</span>
-          <span class="label">${opt.label}</span>
-        `;
-        btn.addEventListener("click", () => toggleAction(opt.id));
-        gridEl.appendChild(btn);
-      });
-
-      const count = state.actions.length;
-      hintEl.textContent = count === 0
-        ? "Wähle mindestens einen kleinen Schritt."
-        : `Ausgewählte Schritte: ${count}`;
-      nextBtn.disabled = count === 0;
-
-    } else if (step === 8) {
-      stepLabelEl.textContent = "Zusammenfassung";
-      titleEl.textContent = "Das hast du gerade mit dir angeschaut:";
-      textEl.textContent =
-        "Das ist kein Urteil, keine Diagnose – nur ein ehrlicher Spiegel für diesen Moment.";
-
-      const summaryText = buildSummary();
-      summaryBoxEl.textContent = summaryText;
-      summaryBoxEl.style.display = "block";
-
-      const verse = getVerseForCause(state.cause);
-      verseBox.style.display = "block";
-      verseRefEl.textContent = "Dein Vers für diesen Weg: " + verse.ref;
-      verseTextEl.textContent = verse.text;
-
+      gridEl.innerHTML = "";
       hintEl.textContent =
-        "Wenn du magst, kannst du dir einen Satz daraus merken und mit in deinen Alltag nehmen.";
+        "Lies langsam. Du musst nichts produzieren. Lass die Worte einfach kurz bei dir ankommen.";
     }
-  }
-
-  function getEmotionName(id) {
-    const e = emotionOptions.find(o => o.id === id);
-    return e ? e.label : null;
   }
 
   function toggleEmotion(id) {
-    const idx = state.emotions.indexOf(id);
-    if (idx >= 0) {
-      state.emotions.splice(idx, 1);
+    const idx = state.selectedIds.indexOf(id);
+    if (idx !== -1) {
+      state.selectedIds.splice(idx, 1);
     } else {
-      if (state.emotions.length >= 3) return;
-      state.emotions.push(id);
-    }
-    if (!state.emotions.includes(state.mainEmotion)) {
-      state.mainEmotion = null;
+      if (state.selectedIds.length >= 3) {
+        hintEl.textContent = "Maximal drei Emotionen gleichzeitig – sonst wird es zu voll. 🙂";
+        return;
+      }
+      state.selectedIds.push(id);
     }
     render();
   }
 
-  function toggleAction(id) {
-    const idx = state.actions.indexOf(id);
-    if (idx >= 0) {
-      state.actions.splice(idx, 1);
-    } else {
-      state.actions.push(id);
-    }
-    render();
-  }
-
-  function getCauseText(mainName, causeId) {
-    switch (causeId) {
-      case "kindheit":
-        return (
-          "Ja, deine Kindheit und frühen Erfahrungen können tiefe Spuren hinterlassen.\n\n" +
-          mainName + " ist nicht peinlich oder übertrieben – sie ist ein Signal: " +
-          "Hier ist etwas in dir, das damals zu groß war, um es allein zu tragen.\n\n" +
-          "Der Unterschied zu früher: Heute bist du erwachsen. " +
-          "Du bist nicht mehr ausgeliefert wie ein Kind. Du darfst Grenzen setzen, Hilfe holen, " +
-          "dich schützen lassen.\n\n" +
-          "Das innere Kind in dir darf fühlen – und der erwachsene Teil darf liebevoll für es einstehen."
-        );
-      case "verletzung_menschen":
-        return (
-          "Wenn Menschen uns verletzen, trifft das oft mitten ins Herz. " +
-          mainName + " ist dann wie ein innerer Alarm: \"So wollte ich nicht behandelt werden.\"\n\n" +
-          "Vielleicht warst du ehrlich, treu oder offen – und wurdest nicht ernst genommen, übergangen oder ausgenutzt.\n\n" +
-          "Du darfst traurig, enttäuscht und wütend sein. Das bedeutet nicht, dass du unspirituell bist – " +
-          "es bedeutet, dass du ein Herz hast.\n\n" +
-          "Und dieses Herz ist Gott nicht egal."
-        );
-      case "konflikt_aktuell":
-        return (
-          "Ein aktueller Konflikt frisst Energie. " +
-          mainName + " zeigt dir: Hier stimmt gerade etwas nicht für dich.\n\n" +
-          "Vielleicht fühlst du dich missverstanden, angegriffen oder ungerecht behandelt. " +
-          "Vielleicht hast du auch selbst Dinge gesagt, die du so nicht wolltest.\n\n" +
-          "Du musst nicht sofort alles klären.\n\n" +
-          "Oft hilft es, zuerst innerlich zur Ruhe zu kommen, bevor man wieder in ein Gespräch geht: " +
-          "Was willst du wirklich sagen? Was ist dir wichtig? Was ist dein Anteil – und was nicht?"
-        );
-      case "ueberforderung":
-        return (
-          "Überforderung bedeutet nicht, dass du versagt hast – sondern dass du zu viel trägst.\n\n" +
-          mainName + " ist ein ehrliches Signal deines Systems: \"Es ist zu viel.\"\n\n" +
-          "Du bist kein Roboter. Du hast Grenzen – und sie sind von Gott gedacht.\n\n" +
-          "Du darfst Aufgaben abgeben, Prioritäten setzen, auch mal \"Nein\" sagen – " +
-          "selbst wenn andere das nicht sofort verstehen.\n\n" +
-          "Du bist wertvoll, auch wenn du nicht alles schaffst."
-        );
-      case "angst_zukunft":
-        return (
-          "Angst vor der Zukunft kann das Jetzt vergiften. " +
-          mainName + " zeigt, dass dir etwas wichtig ist: Sicherheit, Versorgung, Menschen, die du liebst.\n\n" +
-          "Du musst die ganze Zukunft nicht heute lösen.\n\n" +
-          "Du darfst deinen Blick kleiner machen: Was ist der nächste liebevolle Schritt – heute oder morgen? " +
-          "Wer könnte dich begleiten? Woran erinnerst du dich, wo Gott dich schon einmal durchgetragen hat?\n\n" +
-          "Deine Angst darf da sein – und trotzdem bist du nicht ausgeliefert."
-        );
-      case "unbekannt":
-      default:
-        return (
-          "Manchmal ist da einfach nur ein schweres, wirres Gefühl – und du weißt gar nicht genau, warum.\n\n" +
-          "Auch dann ist " + mainName.toLowerCase() + " nicht sinnlos. Sie zeigt: Da ist etwas in dir, das Aufmerksamkeit braucht.\n\n" +
-          "Du musst es heute nicht komplett verstehen.\n\n" +
-          "Allein, dass du kurz innehältst, hinspürst und dich nicht ablenkst, ist bereits ein Schritt in Richtung Heilung."
-        );
-    }
-  }
-
-  function buildSummary() {
-    const lines = [];
-    const emotionNames = state.emotions
-      .map(id => emotionOptions.find(o => o.id === id)?.label)
-      .filter(Boolean);
-
-    if (emotionNames.length) {
-      lines.push(
-        "Du hast dir folgende Emotionen ehrlich angeschaut:\n" +
-        "• " + emotionNames.join("\n• ")
-      );
-    }
-
-    if (state.mainEmotion) {
-      const mainName = getEmotionName(state.mainEmotion);
-      if (mainName) {
-        lines.push("\nAm stärksten spürst du gerade: " + mainName + ".");
+  function goNext() {
+    if (state.screen === "select") {
+      if (state.selectedIds.length === 0) {
+        hintEl.textContent = "Wähle mindestens eine Emotion aus, damit wir weitermachen können.";
+        return;
       }
-    }
 
-    if (state.cause) {
-      const causeName = causeOptions.find(c => c.id === state.cause)?.label;
-      if (causeName) {
-        lines.push("Tiefer Zusammenhang, den du gespürt hast: " + causeName + ".");
+      if (state.selectedIds.length === 1) {
+        // Deine gewünschte Logik:
+        // bei nur EINER Emotion: kein „Welche davon“-Schritt,
+        // sondern direkter Zuspruch zu genau dieser
+        state.activeEmotionId = state.selectedIds[0];
+        state.screen = "result";
+      } else {
+        // zwei oder drei Emotionen → Intensitätsfrage
+        state.activeEmotionId = null;
+        state.screen = "intensity";
       }
-    }
-
-    if (state.actions.length) {
-      const actionTexts = state.actions
-        .map(id => actionOptions.find(a => a.id === id)?.label)
-        .filter(Boolean);
-      if (actionTexts.length) {
-        lines.push(
-          "\nDeine gewählten nächsten Schritte:\n" +
-          "• " + actionTexts.join("\n• ")
-        );
-      }
-    }
-
-    lines.push(
-      "\nDu musst nicht perfekt reagieren.\n" +
-      "Ein ehrlicher kleiner Schritt in deine Richtung ist schon Veränderung."
-    );
-
-    return lines.join("\n");
-  }
-
-  backBtn.addEventListener("click", () => {
-    if (state.step > 1) {
-      setStep(state.step - 1);
-    }
-  });
-
-  nextBtn.addEventListener("click", () => {
-    if (state.step === 8) {
-      state.step = 1;
-      state.emotions = [];
-      state.mainEmotion = null;
-      state.cause = null;
-      state.actions = [];
       render();
-      return;
+    } else if (state.screen === "intensity") {
+      if (!state.activeEmotionId) {
+        hintEl.textContent = "Wähle eine Emotion aus, bevor du weitergehst.";
+        return;
+      }
+      state.screen = "result";
+      render();
+    } else if (state.screen === "result") {
+      // Neustart
+      state.screen = "select";
+      state.selectedIds = [];
+      state.activeEmotionId = null;
+      render();
     }
-    if (state.step === 1) setStep(2);
-    else if (state.step === 2) setStep(3);
-    else if (state.step === 3) setStep(4);
-    else if (state.step === 4) setStep(5);
-    else if (state.step === 5) setStep(6);
-    else if (state.step === 6) setStep(7);
-    else if (state.step === 7) setStep(8);
-  });
+  }
 
-  setStep(1);
+  function goBack() {
+    if (state.screen === "select") return;
+    if (state.screen === "intensity") {
+      state.screen = "select";
+      state.activeEmotionId = null;
+    } else if (state.screen === "result") {
+      if (state.selectedIds.length === 1) {
+        // bei einer Emotion zurück zur Auswahl
+        state.screen = "select";
+        state.activeEmotionId = null;
+      } else {
+        // bei mehreren wieder zur Intensität
+        state.screen = "intensity";
+        state.activeEmotionId = null;
+      }
+    }
+    render();
+  }
+
+  backBtn.addEventListener("click", goBack);
+  nextBtn.addEventListener("click", goNext);
+
+  // Start
+  state.screen = "select";
+  render();
 </script>
 </body>
 </html>
