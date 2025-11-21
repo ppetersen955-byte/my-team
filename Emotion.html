@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Emotions-Navi</title>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #0b1120;
+      --accent-orange: #f97316;
+      --accent-blue: #38bdf8;
+      --accent-green: #22c55e;
+      --accent-rose: #fb7185;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --border-subtle: #1f2937;
+      --shadow-soft: 0 16px 40px rgba(0,0,0,0.5);
+      --radius-xl: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: radial-gradient(circle at top, #1e293b 0, #020617 50%, #000 100%);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text-main);
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 480px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    header {
+      text-align: center;
+      padding-top: 4px;
+    }
+
+    header h1 {
+      margin: 4px 0;
+      font-size: 22px;
+      letter-spacing: 0.03em;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .card {
+      background: linear-gradient(145deg, #020617, #020617, #0b1120);
+      border-radius: var(--radius-xl);
+      padding: 14px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 260px;
+    }
+
+    .badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.8);
+      border: 1px solid #1f2937;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent-orange);
+    }
+
+    .badge-soft {
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.5);
+      border: 1px dashed #1f2937;
+    }
+
+    .title {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .calm-phrase {
+      font-size: 12px;
+      color: var(--accent-blue);
+      margin-top: -4px;
+      margin-bottom: 4px;
+    }
+
+    .text {
+      font-size: 14px;
+      color: #e5e7eb;
+      white-space: pre-wrap;
+    }
+
+    .tile-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .tile {
+      border-radius: 14px;
+      padding: 9px 10px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid rgba(148,163,184,0.25);
+      background: radial-gradient(circle at top left, rgba(248,250,252,0.05), transparent 55%);
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      line-height: 1.3;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, border-color 0.08s ease, background 0.08s ease;
+    }
+
+    .tile span.emoji {
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: -1px;
+    }
+
+    .tile span.label { flex: 1; }
+
+    .tile:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+      border-color: rgba(248,250,252,0.25);
+      background: radial-gradient(circle at top left, rgba(248,250,252,0.1), transparent 55%);
+    }
+
+    .tile.orange {
+      border-color: rgba(248, 148, 48, 0.55);
+      background: radial-gradient(circle at top left, rgba(248, 148, 48, 0.18), transparent 60%);
+    }
+
+    .tile.blue {
+      border-color: rgba(56, 189, 248, 0.55);
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 60%);
+    }
+
+    .tile.green {
+      border-color: rgba(52, 211, 153, 0.55);
+      background: radial-gradient(circle at top left, rgba(52, 211, 153, 0.16), transparent 60%);
+    }
+
+    .tile.rose {
+      border-color: rgba(251, 113, 133, 0.55);
+      background: radial-gradient(circle at top left, rgba(251, 113, 133, 0.2), transparent 60%);
+    }
+
+    .tile.selected {
+      transform: translateY(1px);
+      border-width: 2px;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.6);
+      background: radial-gradient(circle at top left, rgba(248,250,252,0.18), transparent 65%);
+    }
+
+    .summary-box {
+      margin-top: 4px;
+      padding: 8px;
+      border-radius: 12px;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid #1f2937;
+      font-size: 13px;
+      color: #e5e7eb;
+      white-space: pre-wrap;
+    }
+
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .nav-btn {
+      flex: 1;
+      border-radius: 999px;
+      padding: 8px 10px;
+      font-size: 13px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .nav-btn span.icon { font-size: 14px; }
+
+    .nav-btn.secondary {
+      background: rgba(15,23,42,0.9);
+      color: var(--text-muted);
+      border: 1px solid #1f2937;
+    }
+
+    .nav-btn.primary {
+      background: var(--accent-orange);
+      color: #111827;
+      font-weight: 600;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    footer {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      padding-bottom: 4px;
+    }
+
+    @media (max-width: 380px) {
+      .tile-grid {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Emotions-Navi</h1>
+    <p>Wähle, was du fühlst – und lass dich Schritt für Schritt begleiten.</p>
+  </header>
+
+  <div class="card">
+    <div class="badge-row">
+      <div class="badge">
+        <div class="badge-dot"></div>
+        <span id="badge-label">Start</span>
+      </div>
+      <div class="badge-soft" id="step-label"></div>
+    </div>
+
+    <div class="title" id="node-title">Welche Emotionen sind gerade da?</div>
+    <div class="calm-phrase" id="calm-phrase"></div>
+    <div class="text" id="node-text"></div>
+
+    <div class="tile-grid" id="tile-grid"></div>
+
+    <div class="summary-box" id="summary-box" style="display:none;"></div>
+
+    <div class="nav-row">
+      <button class="nav-btn secondary" id="back-btn">
+        <span class="icon">←</span><span>Zurück</span>
+      </button>
+      <button class="nav-btn primary" id="next-btn">
+        <span class="icon">➡️</span><span>Weiter</span>
+      </button>
+    </div>
+  </div>
+
+  <footer>
+    Du musst nichts perfekt machen. 2–3 Minuten Ehrlichkeit mit dir selbst reichen.
+  </footer>
+</div>
+
+<script>
+  // Emotionen, die ausgewählt werden können
+  const EMOTIONS = [
+    { id: "wut", label: "Wütend / genervt", emoji: "🔥", color: "orange" },
+    { id: "traurig", label: "Traurig / verletzt", emoji: "💧", color: "rose" },
+    { id: "angst", label: "Ängstlich / unsicher", emoji: "😰", color: "blue" },
+    { id: "verzweiflung", label: "Verzweifelt / hoffnungslos", emoji: "🕳️", color: "rose" },
+    { id: "freude", label: "Freudig / aufgedreht", emoji: "✨", color: "green" },
+    { id: "erleichterung", label: "Erleichtert / gelöst", emoji: "💨", color: "green" },
+    { id: "müde", label: "Erschöpft / müde", emoji: "😴", color: "blue" },
+    { id: "scham", label: "Scham / peinlich berührt", emoji: "🙈", color: "orange" }
+  ];
+
+  const calmPhrases = [
+    "Du musst jetzt nichts entscheiden. Erstmal nur wahrnehmen.",
+    "Schon stark, dass du überhaupt hinschaust.",
+    "Du darfst so fühlen, wie du dich gerade fühlst.",
+    "Nicht alles, was du fühlst, musst du sofort lösen.",
+    "Ein ehrlicher Blick auf deine Gefühle ist bereits Veränderung."
+  ];
+
+  const state = {
+    emotions: [],
+    focus: null // "calm" | "insight" | "action"
+  };
+
+  let step = "emotions"; // "emotions" | "interpret" | "focus" | "finish";
+  let history = [];
+
+  const badgeLabelEl = document.getElementById("badge-label");
+  const stepLabelEl = document.getElementById("step-label");
+  const titleEl = document.getElementById("node-title");
+  const textEl = document.getElementById("node-text");
+  const phraseEl = document.getElementById("calm-phrase");
+  const gridEl = document.getElementById("tile-grid");
+  const summaryBoxEl = document.getElementById("summary-box");
+  const backBtn = document.getElementById("back-btn");
+  const nextBtn = document.getElementById("next-btn");
+
+  function pickRandom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function getEmotionLabel(id) {
+    const e = EMOTIONS.find(x => x.id === id);
+    return e ? e.label : id;
+  }
+
+  function renderEmotionsStep() {
+    step = "emotions";
+    history.push(step);
+
+    badgeLabelEl.textContent = "Start";
+    stepLabelEl.textContent = "1/3 – Gefühle wählen";
+    titleEl.textContent = "Welche Emotionen sind gerade da?";
+    phraseEl.textContent = pickRandom(calmPhrases);
+    textEl.textContent =
+      "Tippe auf alle Kacheln, die zu deiner jetzigen Stimmung passen. Du darfst mehrere auswählen – Gefühle widersprechen sich manchmal.";
+
+    summaryBoxEl.style.display = "none";
+    gridEl.innerHTML = "";
+
+    EMOTIONS.forEach(em => {
+      const btn = document.createElement("button");
+      btn.className = "tile " + em.color;
+      btn.dataset.id = em.id;
+      btn.innerHTML = `
+        <span class="emoji">${em.emoji}</span>
+        <span class="label">${em.label}</span>
+      `;
+
+      if (state.emotions.includes(em.id)) {
+        btn.classList.add("selected");
+      }
+
+      btn.addEventListener("click", () => {
+        toggleEmotion(em.id, btn);
+      });
+
+      gridEl.appendChild(btn);
+    });
+
+    nextBtn.disabled = state.emotions.length === 0;
+    nextBtn.querySelector("span.icon").textContent = "➡️";
+    nextBtn.querySelectorAll("span")[1].textContent = "Weiter";
+  }
+
+  function toggleEmotion(id, btn) {
+    const index = state.emotions.indexOf(id);
+    if (index === -1) {
+      state.emotions.push(id);
+      btn.classList.add("selected");
+    } else {
+      state.emotions.splice(index, 1);
+      btn.classList.remove("selected");
+    }
+    nextBtn.disabled = state.emotions.length === 0;
+  }
+
+  function buildInterpretationText() {
+    if (state.emotions.length === 0) {
+      return "Du hast noch keine Emotion ausgewählt.";
+    }
+
+    const labels = state.emotions.map(getEmotionLabel);
+    const listText = labels.join(", ");
+
+    const lines = [];
+    lines.push(`Du fühlst dich gerade: ${listText}.`);
+
+    if (state.emotions.length >= 3) {
+      lines.push("Das ist eine ziemlich dichte Mischung – kein Wunder, dass sich das innerlich voll anfühlt.");
+    } else if (state.emotions.length === 2) {
+      lines.push("Zwei starke Gefühle gleichzeitig – das kann sich sehr widersprüchlich anfühlen.");
+    } else {
+      lines.push("Ein Gefühl klar wahrzunehmen ist schon ein großer Schritt.");
+    }
+
+    if (state.emotions.includes("wut") && state.emotions.includes("verzweiflung")) {
+      lines.push("Zwischen Wut und Verzweiflung steckt oft der Wunsch: „Ich will, dass sich endlich etwas ändert, weiß aber nicht wie.“");
+    }
+
+    if (state.emotions.includes("freude") &&
+        (state.emotions.includes("traurig") || state.emotions.includes("angst") || state.emotions.includes("verzweiflung"))) {
+      lines.push("Dass Freude UND schwere Gefühle da sind, zeigt: In dir ist trotzdem noch Licht – auch wenn es sich gerade gemischt anfühlt.");
+    }
+
+    if (state.emotions.includes("müde")) {
+      lines.push("Erschöpfung ist oft ein Zeichen, dass du lange durchgehalten hast. Dein Körper bittet vielleicht um echte Pause, nicht nur Ablenkung.");
+    }
+
+    if (state.emotions.includes("scham")) {
+      lines.push("Scham will dich oft zum Schweigen bringen. Aber du bist mehr als deine Fehler und mehr als das, wofür du dich schämst.");
+    }
+
+    lines.push("\nDie Frage ist jetzt: Was brauchst du als NÄCHSTES am meisten?");
+
+    return lines.join("\n");
+  }
+
+  function renderInterpretStep() {
+    step = "interpret";
+    history.push(step);
+
+    badgeLabelEl.textContent = "Deine Gefühle";
+    stepLabelEl.textContent = "2/3 – Deuten & wählen";
+    titleEl.textContent = "Was macht diese Mischung mit dir?";
+    phraseEl.textContent = pickRandom(calmPhrases);
+    textEl.textContent = buildInterpretationText();
+
+    summaryBoxEl.style.display = "none";
+    gridEl.innerHTML = "";
+
+    const options = [
+      {
+        id: "calm",
+        label: "Ich will erstmal runterkommen",
+        emoji: "🧘",
+        color: "green"
+      },
+      {
+        id: "insight",
+        label: "Ich will verstehen, was dahinter steckt",
+        emoji: "🔍",
+        color: "blue"
+      },
+      {
+        id: "action",
+        label: "Ich will entscheiden, wie ich reagieren will",
+        emoji: "🛣️",
+        color: "orange"
+      }
+    ];
+
+    options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "tile " + opt.color;
+      btn.dataset.id = opt.id;
+      btn.innerHTML = `
+        <span class="emoji">${opt.emoji}</span>
+        <span class="label">${opt.label}</span>
+      `;
+      btn.addEventListener("click", () => {
+        state.focus = opt.id;
+        renderFocusStep();
+      });
+      gridEl.appendChild(btn);
+    });
+
+    nextBtn.disabled = false;
+    nextBtn.querySelector("span.icon").textContent = "➡️";
+    nextBtn.querySelectorAll("span")[1].textContent = "Weiter";
+  }
+
+  function buildFocusText() {
+    const labels = state.emotions.map(getEmotionLabel).join(", ") || "deine Gefühle";
+    let focusText = "";
+
+    if (state.focus === "calm") {
+      focusText =
+        "Dein System ist gerade ziemlich voll. Bevor du irgendetwas klärst oder entscheidest, darfst du einfach kurz „runterfahren“.\n\n" +
+        "Mini-Ideen für die nächsten 2–5 Minuten:\n" +
+        "• 4 Sekunden einatmen – kurz halten – 6 Sekunden ausatmen (5–10x).\n" +
+        "• Einmal aufstehen, Schultern kreisen, kaltes Wasser an die Handgelenke.\n" +
+        "• Kurz ans Fenster, tief schauen: „Gerade muss nichts gelöst werden.“\n\n" +
+        "Du darfst dir offiziell eine Mini-Pause geben – ohne Rechtfertigung.";
+    } else if (state.focus === "insight") {
+      focusText =
+        "Hinter " + labels + " steckt meistens mehr als die Situation von heute.\n\n" +
+        "Fragen, die dir helfen können:\n" +
+        "• Kenn ich dieses Gefühl schon aus früheren Zeiten?\n" +
+        "• Wer hat mich früher ähnlich fühlen lassen?\n" +
+        "• Was glaube ich gerade über mich selbst: „Ich bin …“?\n\n" +
+        "Du musst nicht alles analysieren – es reicht, einen kleinen Punkt zu entdecken, der dir auffällt.";
+    } else if (state.focus === "action") {
+      focusText =
+        "Mit diesen Gefühlen im Bauch etwas zu tun, ist mutig.\n\n" +
+        "Nützliche Fragen:\n" +
+        "• Was wäre ein kleiner, fairer Schritt – nicht der perfekte?\n" +
+        "• Was würde ich meinem besten Freund in meiner Situation raten?\n" +
+        "• Was kann ich heute tun – und was gehört eher in „später“?\n\n" +
+        "Du darfst Entscheidungen in kleine Schritte aufteilen. Ein nächster Schritt reicht.";
+    } else {
+      focusText = "Du bist gerade dabei, einen nächsten Schritt mit dir selbst zu gehen. Das allein ist schon stark.";
+    }
+
+    return focusText;
+  }
+
+  function renderFocusStep() {
+    step = "focus";
+    history.push(step);
+
+    let badgeText = "Nächster Schritt";
+    if (state.focus === "calm") badgeText = "Runterkommen";
+    if (state.focus === "insight") badgeText = "Verstehen";
+    if (state.focus === "action") badgeText = "Handeln";
+
+    badgeLabelEl.textContent = badgeText;
+    stepLabelEl.textContent = "3/3 – Kleiner nächster Schritt";
+    titleEl.textContent = "Was kannst du dir jetzt Gutes tun?";
+    phraseEl.textContent = pickRandom(calmPhrases);
+    textEl.textContent = buildFocusText();
+
+    summaryBoxEl.style.display = "none";
+    gridEl.innerHTML = "";
+
+    const tiles = [];
+
+    if (state.focus === "calm") {
+      tiles.push(
+        { label: "2 Minuten bewusst atmen", emoji: "🌬️", color: "green" },
+        { label: "Ganz kurz Bewegung / Strecken", emoji: "🚶", color: "blue" },
+        { label: "Wasser trinken & Handy kurz weglegen", emoji: "💧", color: "orange" },
+        { label: "Ich brauche eine richtige Pause später", emoji: "🕒", color: "rose" }
+      );
+    } else if (state.focus === "insight") {
+      tiles.push(
+        { label: "Ich schreibe mir 2–3 Sätze auf", emoji: "✍️", color: "blue" },
+        { label: "Ich erzähle es einer Person, der ich vertraue", emoji: "🗣️", color: "green" },
+        { label: "Ich nehme mir vor, später tiefer reinzugehen", emoji: "🧠", color: "orange" },
+        { label: "Ich erkenne: Das Gefühl ist verständlich", emoji: "🤍", color: "rose" }
+      );
+    } else if (state.focus === "action") {
+      tiles.push(
+        { label: "Einen kleinen, fairen Satz formulieren", emoji: "💬", color: "orange" },
+        { label: "Das Gespräch vertagen – aber notieren", emoji: "📅", color: "blue" },
+        { label: "Eine klare Grenze in mir ziehen", emoji: "🚧", color: "rose" },
+        { label: "Jemanden um Unterstützung bitten", emoji: "🧡", color: "green" }
+      );
+    }
+
+    tiles.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "tile " + opt.color;
+      btn.innerHTML = `
+        <span class="emoji">${opt.emoji}</span>
+        <span class="label">${opt.label}</span>
+      `;
+      btn.addEventListener("click", () => {
+        renderFinishStep(opt.label);
+      });
+      gridEl.appendChild(btn);
+    });
+
+    nextBtn.disabled = false;
+    nextBtn.querySelector("span.icon").textContent = "✅";
+    nextBtn.querySelectorAll("span")[1].textContent = "Zum Abschluss";
+    nextBtn.onclick = () => renderFinishStep(null);
+  }
+
+  function buildFinishText(choiceLabel) {
+    const labels = state.emotions.map(getEmotionLabel);
+    const emotionsText = labels.length
+      ? labels.join(", ")
+      : "deine Gefühle";
+
+    const lines = [];
+    lines.push("Du hast dir gerade Zeit genommen, deine Gefühle nicht wegzudrücken, sondern sie anzuschauen.");
+    lines.push("");
+    lines.push("Aktuell spürst du vor allem: " + emotionsText + ".");
+
+    if (state.focus === "calm") {
+      lines.push("Dein Schwerpunkt war: Erstmal herunterkommen und dein System entlasten.");
+    } else if (state.focus === "insight") {
+      lines.push("Dein Schwerpunkt war: Verstehen, was hinter den Gefühlen steckt.");
+    } else if (state.focus === "action") {
+      lines.push("Dein Schwerpunkt war: Einen fairen, machbaren nächsten Schritt zu finden.");
+    }
+
+    if (choiceLabel) {
+      lines.push("");
+      lines.push("Dein nächster kleiner Schritt könnte sein:");
+      lines.push("→ " + choiceLabel);
+    }
+
+    lines.push("");
+    lines.push("Du musst die ganze Situation nicht heute lösen. Aber du hast heute etwas sehr Wichtiges getan: Du warst ehrlich mit dir.");
+    lines.push("");
+    lines.push("Wenn du magst, kannst du die App später noch einmal öffnen und schauen, ob sich deine Gefühle verändert haben.");
+
+    return lines.join("\n");
+  }
+
+  function renderFinishStep(choiceLabel) {
+    step = "finish";
+    history.push(step);
+
+    badgeLabelEl.textContent = "Abschluss";
+    stepLabelEl.textContent = "Fokus gefunden";
+    titleEl.textContent = "Kurz zusammengefasst:";
+    phraseEl.textContent = pickRandom(calmPhrases);
+    textEl.textContent = "Hier ist dein kleiner Klarheits-Moment:";
+
+    gridEl.innerHTML = "";
+    summaryBoxEl.style.display = "block";
+    summaryBoxEl.textContent = buildFinishText(choiceLabel);
+
+    nextBtn.querySelector("span.icon").textContent = "🏠";
+    nextBtn.querySelectorAll("span")[1].textContent = "Zum Start";
+    nextBtn.disabled = false;
+    nextBtn.onclick = () => {
+      state.emotions = [];
+      state.focus = null;
+      history = [];
+      renderEmotionsStep();
+    };
+  }
+
+  backBtn.addEventListener("click", () => {
+    if (history.length <= 1) return;
+    history.pop();
+    const prev = history[history.length - 1];
+    if (prev === "emotions") renderEmotionsStep();
+    if (prev === "interpret") renderInterpretStep();
+    if (prev === "focus") renderFocusStep();
+    if (prev === "finish") renderFinishStep();
+  });
+
+  nextBtn.addEventListener("click", () => {
+    if (step === "emotions") {
+      if (state.emotions.length === 0) return;
+      renderInterpretStep();
+    } else if (step === "interpret") {
+      renderFocusStep();
+    } else if (step === "focus") {
+      renderFinishStep(null);
+    } else if (step === "finish") {
+      state.emotions = [];
+      state.focus = null;
+      history = [];
+      renderEmotionsStep();
+    }
+  });
+
+  // Start
+  renderEmotionsStep();
+</script>
+</body>
+</html>
