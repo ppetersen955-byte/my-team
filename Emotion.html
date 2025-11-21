@@ -336,7 +336,8 @@
   const EMOTIONS = [
     {
       id: "wut",
-      label: "Wut / Ärger",
+      label: "wütend",
+      display: "Wut / Ärger",
       emoji: "🔥",
       color: "orange",
       verseRef: "Epheser 4,26",
@@ -345,7 +346,8 @@
     },
     {
       id: "angst",
-      label: "Angst / Unsicherheit",
+      label: "ängstlich",
+      display: "Angst / Unsicherheit",
       emoji: "😰",
       color: "blue",
       verseRef: "Jesaja 41,10",
@@ -354,7 +356,8 @@
     },
     {
       id: "traurigkeit",
-      label: "Traurigkeit",
+      label: "traurig",
+      display: "Traurigkeit",
       emoji: "😢",
       color: "rose",
       verseRef: "Psalm 34,19",
@@ -363,7 +366,8 @@
     },
     {
       id: "ueberfordert",
-      label: "Überforderung",
+      label: "überfordert",
+      display: "Überforderung",
       emoji: "🧠",
       color: "green",
       verseRef: "Matthäus 11,28",
@@ -372,7 +376,8 @@
     },
     {
       id: "scham",
-      label: "Scham / Schuldgefühle",
+      label: "beschämt / schuldig",
+      display: "Scham / Schuldgefühle",
       emoji: "🙈",
       color: "blue",
       verseRef: "Römer 8,1",
@@ -381,7 +386,8 @@
     },
     {
       id: "einsam",
-      label: "Einsamkeit",
+      label: "einsam",
+      display: "Einsamkeit",
       emoji: "🌒",
       color: "rose",
       verseRef: "Psalm 27,10",
@@ -390,7 +396,8 @@
     },
     {
       id: "enttaeuschung",
-      label: "Enttäuschung",
+      label: "enttäuscht",
+      display: "Enttäuschung",
       emoji: "💔",
       color: "orange",
       verseRef: "Sprüche 13,12",
@@ -450,7 +457,7 @@
         btn.className = "tile " + emo.color + (isSelected ? " selected" : "");
         btn.innerHTML = `
           <span class="emoji">${emo.emoji}</span>
-          <span class="label">${emo.label}</span>
+          <span class="label">${emo.display}</span>
         `;
         btn.addEventListener("click", () => {
           toggleEmotion(emo.id);
@@ -459,37 +466,50 @@
       });
 
       hintEl.textContent = "Du kannst 1–3 Emotionen wählen. Danach unten auf „Weiter“ tippen.";
-      verseBoxEl.style.display = "none";
 
     } else if (state.screen === "intensity") {
       badgeLabelEl.textContent = "Schritt 2 · Gewichtung";
-      titleEl.textContent = "Welche davon fühlt sich gerade am intensivsten an?";
-      descEl.textContent =
-        "Manchmal sind mehrere Gefühle da. Wähle die Emotion, die gerade am deutlichsten in dir schreit.";
-      nextLabelEl.textContent = "Weiter";
       backBtn.disabled = false;
       backBtn.style.opacity = 1;
+      nextLabelEl.textContent = "Weiter";
 
       const selected = state.selectedIds.map(getEmotionById).filter(Boolean);
       secondaryLabelEl.textContent = `${selected.length} ausgewählt`;
 
-      selected.forEach((emo) => {
-        const btn = document.createElement("button");
-        const isActive = state.activeEmotionId === emo.id;
-        btn.className = "tile " + emo.color + (isActive ? " selected" : "");
-        btn.innerHTML = `
-          <span class="emoji">${emo.emoji}</span>
-          <span class="label">${emo.label}</span>
-        `;
-        btn.addEventListener("click", () => {
-          state.activeEmotionId = emo.id;
-          render();
-        });
-        gridEl.appendChild(btn);
-      });
+      if (selected.length === 1) {
+        const emo = selected[0];
+        // Text für NUR EINE Emotion
+        titleEl.textContent = "Du hast diese Emotion gewählt:";
+        descEl.textContent =
+          `Du bist gerade ${emo.label}.\n\nWir schauen gleich, was Gott dir genau in diesem Gefühl sagen möchte. Tippe unten auf „Weiter“.`;
+        // keine extra Auswahl nötig
+        state.activeEmotionId = emo.id;
+        gridEl.innerHTML = "";
+        hintEl.textContent = "Wenn du bereit bist, tippe auf „Weiter“.";
 
-      hintEl.textContent = "Tippe die Emotion an, die sich im Moment am stärksten anfühlt.";
-      verseBoxEl.style.display = "none";
+      } else {
+        // 2 oder 3 Emotionen → wie bisher
+        titleEl.textContent = "Welche davon fühlt sich gerade am intensivsten an?";
+        descEl.textContent =
+          "Manchmal sind mehrere Gefühle da. Wähle die Emotion, die gerade am deutlichsten in dir schreit.";
+
+        selected.forEach((emo) => {
+          const btn = document.createElement("button");
+          const isActive = state.activeEmotionId === emo.id;
+          btn.className = "tile " + emo.color + (isActive ? " selected" : "");
+          btn.innerHTML = `
+            <span class="emoji">${emo.emoji}</span>
+            <span class="label">${emo.display}</span>
+          `;
+          btn.addEventListener("click", () => {
+            state.activeEmotionId = emo.id;
+            render();
+          });
+          gridEl.appendChild(btn);
+        });
+
+        hintEl.textContent = "Tippe die Emotion an, die sich im Moment am stärksten anfühlt.";
+      }
 
     } else if (state.screen === "result") {
       const emo = getEmotionById(state.activeEmotionId);
@@ -505,16 +525,9 @@
         return;
       }
 
-      // Text abhängig davon, ob nur 1 oder mehrere Emotionen gewählt wurden
-      if (state.selectedIds.length === 1) {
-        titleEl.textContent = "Du hast diese Emotion gewählt:";
-        descEl.textContent =
-          `„${emo.label}“ – wir schauen jetzt, was Gott dir genau in diesem Gefühl sagen möchte.`;
-      } else {
-        titleEl.textContent = "Diese Emotion steht gerade im Vordergrund:";
-        descEl.textContent =
-          `„${emo.label}“ – mitten in diesem Gefühl möchte Gott dir begegnen und zu deinem Herzen sprechen.`;
-      }
+      titleEl.textContent = "Du bist gerade so unterwegs:";
+      descEl.textContent =
+        `Du bist gerade ${emo.label}.\n\nUnd genau so, in diesem Gefühl, sieht Gott dich und möchte zu dir sprechen.`;
 
       verseBoxEl.style.display = "block";
       verseRefEl.textContent = emo.verseRef;
@@ -523,7 +536,7 @@
 
       gridEl.innerHTML = "";
       hintEl.textContent =
-        "Lies langsam. Du musst nichts produzieren. Lass die Worte einfach kurz bei dir ankommen.";
+        "Lies langsam. Du musst nichts leisten. Lass die Worte einfach kurz bei dir ankommen.";
     }
   }
 
@@ -547,19 +560,15 @@
         hintEl.textContent = "Wähle mindestens eine Emotion aus, damit wir weitermachen können.";
         return;
       }
-
+      state.screen = "intensity";
+      // bei genau einer Emotion direkt setzen
       if (state.selectedIds.length === 1) {
-        // Deine gewünschte Logik:
-        // bei nur EINER Emotion: kein „Welche davon“-Schritt,
-        // sondern direkter Zuspruch zu genau dieser
         state.activeEmotionId = state.selectedIds[0];
-        state.screen = "result";
       } else {
-        // zwei oder drei Emotionen → Intensitätsfrage
         state.activeEmotionId = null;
-        state.screen = "intensity";
       }
       render();
+
     } else if (state.screen === "intensity") {
       if (!state.activeEmotionId) {
         hintEl.textContent = "Wähle eine Emotion aus, bevor du weitergehst.";
@@ -567,6 +576,7 @@
       }
       state.screen = "result";
       render();
+
     } else if (state.screen === "result") {
       // Neustart
       state.screen = "select";
@@ -578,9 +588,11 @@
 
   function goBack() {
     if (state.screen === "select") return;
+
     if (state.screen === "intensity") {
       state.screen = "select";
       state.activeEmotionId = null;
+
     } else if (state.screen === "result") {
       if (state.selectedIds.length === 1) {
         // bei einer Emotion zurück zur Auswahl
