@@ -300,7 +300,7 @@
     <div class="text" id="description">
       Tippe die Kreise an, bevor sie dein Herz erreichen. Jeder Tipp ist ein „Nein“ zur Lüge.
       Das Spiel läuft, bis eine Anfechtung dein Herz berührt – oder du 99 Angriffe abgewehrt hast.
-      Ab 20, 50 und 70 wird es spürbar schwerer.
+      Ab 25, 50 und 75 werden es deutlich mehr.
     </div>
 
     <div class="playfield-wrapper">
@@ -338,28 +338,21 @@
   const targetBlocks = 99;
 
   const enemiesPool = [
-    // Feind / Satan
     { label: "Satan – Ankläger", emoji: "👿" },
     { label: "Feind – Lüge", emoji: "🗯️" },
     { label: "Finsternis", emoji: "🌑" },
     { label: "Verdammnis", emoji: "⚡" },
     { label: "Anfechtung", emoji: "🔥" },
-
-    // Selbsthass / Identität
     { label: "Selbsthass", emoji: "💣" },
     { label: "Ich bin nichts wert", emoji: "💔" },
     { label: "Ich bin ein Versager", emoji: "📉" },
     { label: "Keiner braucht mich", emoji: "🚫" },
     { label: "Ich bin zu viel", emoji: "🧨" },
-
-    // Zweifel / Ungewissheit
     { label: "Ungewissheit", emoji: "🌫️" },
     { label: "Zweifel", emoji: "❓" },
     { label: "Gott ist nicht da", emoji: "🚷" },
     { label: "Das wird nie besser", emoji: "🕳️" },
     { label: "Angst-Gedanke", emoji: "😨" },
-
-    // Todsünden / destruktiv
     { label: "Stolz", emoji: "👑" },
     { label: "Neid", emoji: "🧿" },
     { label: "Zorn", emoji: "💥" },
@@ -367,14 +360,10 @@
     { label: "Habgier", emoji: "💰" },
     { label: "Völlerei", emoji: "🍖" },
     { label: "Unreine Gedanken", emoji: "🩸" },
-
-    // Beziehung / Ablehnung
     { label: "Du bist allein", emoji: "🚪" },
     { label: "Keiner versteht dich", emoji: "🧊" },
     { label: "Du nervst alle", emoji: "📵" },
     { label: "Du bist schuld", emoji: "⚠️" },
-
-    // Extra
     { label: "Es lohnt sich nicht", emoji: "🧨" },
     { label: "Hoffnungslosigkeit", emoji: "🕯️" },
     { label: "Chaos im Kopf", emoji: "🌪️" }
@@ -457,10 +446,10 @@
   }
 
   function getSpawnDelay() {
-    // Stufen: 0–19, 20–49, 50–69, 70–99
-    if (blocked < 20) return 1100;
+    // 0–24: entspannt, 25–49: dichter, 50–74: noch dichter, 75–99: sehr dicht
+    if (blocked < 25) return 1100;
     if (blocked < 50) return 800;
-    if (blocked < 70) return 550;
+    if (blocked < 75) return 550;
     return 350;
   }
 
@@ -479,30 +468,10 @@
     startLabelEl.textContent = "Läuft...";
     badgeLabelEl.textContent = "Spiel läuft";
     descEl.textContent =
-      "Tippe die Angriffe an, bevor sie dein Herz erreichen. Ab 20, 50 und 70 wird es immer dichter und chaotischer.\n" +
+      "Tippe die Angriffe an, bevor sie dein Herz erreichen. Ab 25, 50 und 75 werden es mehr.\n" +
       "Sobald eine Anfechtung dein Herz berührt, ist die Runde vorbei. Wenn du 99 schaffst, hast du gewonnen.";
 
     scheduleNextSpawn();
-  }
-
-  function choosePattern() {
-    const d = blocked;
-    const r = Math.random();
-    if (d < 20) {
-      return "straight";
-    } else if (d < 50) {
-      if (r < 0.6) return "straight";
-      if (r < 0.85) return "zigzag";
-      return "wave";
-    } else if (d < 70) {
-      if (r < 0.4) return "straight";
-      if (r < 0.75) return "zigzag";
-      return "wave";
-    } else {
-      if (r < 0.25) return "straight";
-      if (r < 0.6) return "zigzag";
-      return "wave";
-    }
   }
 
   function spawnEnemy() {
@@ -537,16 +506,9 @@
     `;
     playfield.appendChild(el);
 
-    const vx = centerX - startX;
-    const vy = centerY - startY;
-    const len = Math.sqrt(vx * vx + vy * vy) || 1;
-    const px = -vy / len; // senkrecht zur Flugrichtung
-    const py = vx / len;
-
     el.style.left = startX + "%";
     el.style.top = startY + "%";
 
-    const pattern = choosePattern();
     const enemyObj = {
       el,
       startX,
@@ -554,14 +516,11 @@
       x: startX,
       y: startY,
       hit: false,
-      pattern,
-      perpX: px,
-      perpY: py,
       intervalId: null
     };
 
-    const steps = 90;
-    const tickMs = 60;
+    const steps = 90;     // Fixe Geschwindigkeit (immer gleich)
+    const tickMs = 60;    // Bewegung alle 60ms
     let currentStep = 0;
 
     function move() {
@@ -575,22 +534,14 @@
       let t = currentStep / steps;
       if (t > 1) t = 1;
 
-      // seitliche Bewegung je nach Pattern
-      let amplitude = 0;
-      if (enemyObj.pattern === "zigzag") {
-        const phase = Math.floor(currentStep / 6) % 2;
-        amplitude = (phase === 0 ? 10 : -10);
-      } else if (enemyObj.pattern === "wave") {
-        amplitude = 12 * Math.sin(currentStep / 7);
-      }
-
-      enemyObj.x = enemyObj.startX + (centerX - enemyObj.startX) * t + enemyObj.perpX * amplitude;
-      enemyObj.y = enemyObj.startY + (centerY - enemyObj.startY) * t + enemyObj.perpY * amplitude;
+      // Gerade Linie zur Mitte
+      enemyObj.x = enemyObj.startX + (centerX - enemyObj.startX) * t;
+      enemyObj.y = enemyObj.startY + (centerY - enemyObj.startY) * t;
 
       el.style.left = enemyObj.x + "%";
       el.style.top = enemyObj.y + "%";
 
-      // >>> HARTER CUT: echte Pixel-Kollision zwischen Kreisen
+      // HARTE KOLLISION: echte Pixel-Kreise
       const heartRect = heartEl.getBoundingClientRect();
       const enemyRect = el.getBoundingClientRect();
 
@@ -607,7 +558,6 @@
       const enemyRadius = enemyRect.width / 2;
 
       if (dist <= heartRadius + enemyRadius) {
-        // Kreise berühren sich → sofort Game Over
         clearInterval(enemyObj.intervalId);
         if (!enemyObj.hit && gameRunning) {
           enemyObj.hit = true;
@@ -621,7 +571,7 @@
         }
       }
 
-      // Sicherheitsabschaltung, falls irgendwas hängen bleibt
+      // Sicherheitsabschaltung
       if (currentStep > steps + 30) {
         clearInterval(enemyObj.intervalId);
         if (el.parentNode) el.remove();
@@ -655,7 +605,7 @@
     descEl.textContent =
       "Die Kreise stehen für Gedanken und Angriffe: Lügen, Selbsthass, Stimmen des Feindes.\n\n" +
       "Wenn du sie antippst, sagst du innerlich: „Nein. Das ist nicht Gottes Wahrheit über mich.“\n\n" +
-      "Je mehr du abwehrst, desto dichter und chaotischer wird es – so wie im echten Leben. " +
+      "Je mehr du abwehrst, desto mehr prasselt auf dich ein – so wie im echten Leben. " +
       "Und trotzdem gilt: Deine Identität hängt nicht davon ab, wie gut du klickst, sondern daran, was Jesus über dich sagt.";
   });
 
