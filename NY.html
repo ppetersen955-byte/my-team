@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEON CONCRETE '95</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <style>
+        /* === CSS DESIGN === */
+        :root {
+            --gb-bg: #b0b0b0; /* Etwas helleres, generisches Grau */
+            --screen-bg: #000;
+            --text-color: #e0f8cf;
+            --ui-bg: #202020;
+        }
+
+        body {
+            background-color: #121212;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Press Start 2P', cursive;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Das generische Handheld-Gehäuse */
+        .gameboy-case {
+            background-color: var(--gb-bg);
+            padding: 20px;
+            border-radius: 15px 15px 50px 15px; /* Etwas rundere Form */
+            box-shadow: -5px 5px 20px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 300px;
+        }
+
+        .screen-border {
+            background-color: #444; /* Dunklerer Rahmen */
+            padding: 30px 35px;
+            border-radius: 10px 10px 30px 10px;
+            position: relative;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .power-light {
+            width: 8px;
+            height: 8px;
+            background-color: #222;
+            border-radius: 50%;
+            position: absolute;
+            top: 100px;
+            left: 10px;
+            transition: background-color 0.3s;
+            z-index: 20;
+        }
+
+        .power-light.on {
+            background-color: #00ff00; /* Grünes Licht für generischen Look */
+            box-shadow: 0 0 8px #00ff00;
+        }
+
+        /* BRANDING ENTFERNT */
+        .brand {
+            height: 10px; /* Platzhalter ohne Text */
+        }
+
+        /* Bildschirm */
+        .screen {
+            width: 100%;
+            height: 220px;
+            background-color: var(--screen-bg);
+            border: 3px solid #222;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Overlay zum Starten */
+        #start-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #000;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #e0f8cf;
+            text-align: center;
+            cursor: pointer;
+        }
+        #start-overlay h1 { font-size: 20px; margin-bottom: 10px; }
+        #start-overlay p { font-size: 10px; animation: blink 1s infinite; color: #ffff00; }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* Das Bild - WICHTIG */
+        #scene-image {
+            width: 100%;
+            height: 130px;
+            background-color: #333;
+            /* WICHTIG: Damit das Bild den Bereich füllt */
+            background-size: cover; 
+            background-position: center;
+            /* WICHTIG: Damit Pixel-Art scharf bleibt */
+            image-rendering: pixelated; 
+            border-bottom: 2px solid #fff;
+        }
+
+        /* Textbox */
+        .textbox {
+            flex: 1;
+            background-color: var(--ui-bg);
+            padding: 10px;
+            color: var(--text-color);
+            font-size: 9px;
+            line-height: 1.4;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Buttons */
+        button {
+            background: transparent;
+            border: none;
+            color: #aaa;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            padding: 5px 0;
+            cursor: pointer;
+            text-align: left;
+            width: 100%;
+            display: block;
+        }
+        button:hover { color: #fff; text-decoration: underline; }
+        button:before { content: "> "; }
+
+        /* Deko-Elemente unten */
+        .controls { display: flex; justify-content: space-between; width: 100%; padding: 0 10px; box-sizing: border-box; }
+        .d-pad { width: 70px; height: 70px; background: #333; clip-path: polygon(33% 0, 66% 0, 66% 33%, 100% 33%, 100% 66%, 66% 66%, 66% 100%, 33% 100%, 33% 66%, 0 66%, 0 33%, 33% 33%); }
+        .action-buttons { display: flex; gap: 10px; margin-top: 20px; }
+        .a-btn, .b-btn { width: 25px; height: 25px; background: #555; border-radius: 50%; } /* Generische graue Knöpfe */
+        
+        /* Scanlines */
+        .scanlines {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.3) 50%);
+            background-size: 100% 4px; pointer-events: none; z-index: 10; opacity: 0.4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="gameboy-case">
+        <div class="screen-border">
+            <div class="power-light"></div>
+            <div class="screen">
+                <div id="start-overlay">
+                    <h1>NEON<br>CONCRETE<br>'95</h1>
+                    <p>START DRÜCKEN</p>
+                </div>
+                <div id="scene-image"></div> 
+                <div class="scanlines"></div>
+                <div class="textbox">
+                    <p id="story-text"></p>
+                    <div id="choices-container"></div>
+                </div>
+            </div>
+            <div class="brand"></div>
+        </div>
+        <div class="controls">
+            <div class="d-pad"></div>
+            <div class="action-buttons">
+                <div class="b-btn"></div>
+                <div class="a-btn"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === JAVASCRIPT LOGIK ===
+
+        /* ACHTUNG: Ich benutze hier Platzhalter-Bilder aus dem Internet, 
+           damit du siehst, dass es funktioniert. 
+           Unten erkläre ich, wie du deine eigenen einfügst. */
+
+        const scenes = {
+            "start": {
+                // Platzhalter Bild 1 (Blau)
+                img: "https://via.placeholder.com/320x240/0000AA/FFFFFF?text=SZENE+1:+PARK", 
+                text: "Morgengrauen im Central Park. Dein Handy ist leer. Du hast Hunger.",
+                choices: [
+                    { text: "Zum Fast-Food (Strom)", target: "scene_2a" },
+                    { text: "Zur U-Bahn (Wärme)", target: "scene_2b" }
+                ]
+            },
+            "scene_2a": {
+                // Platzhalter Bild 2 (Orange)
+                img: "https://via.placeholder.com/320x240/AA5500/FFFFFF?text=SZENE+2A:+FAST+FOOD",
+                text: "Rote Sitzbänke. Dein Handy lädt langsam an der Wand.",
+                choices: [
+                    { text: "Chef nach Job fragen", target: "scene_3a" },
+                    { text: "Rausgehen & suchen", target: "scene_3b" }
+                ]
+            },
+            "scene_2b": { // GAME OVER
+                // Platzhalter Bild (Rot)
+                img: "https://via.placeholder.com/320x240/AA0000/FFFFFF?text=GAME+OVER:+U-BAHN",
+                text: "U-Bahn. Ein Typ zieht dir dein Handy ab. Alles ist vorbei.",
+                choices: [
+                    { text: "NEUSTART", target: "start" }
+                ]
+            },
+            "scene_3a": { 
+                // Platzhalter Bild
+                img: "https://via.placeholder.com/320x240/555555/FFFFFF?text=SZENE+3A:+KEIN+JOB",
+                text: "Der Filialleiter lacht nur. 'Keine Jobs hier.'",
+                choices: [
+                    { text: "Zurück zur Straße", target: "scene_3b" }
+                ]
+            },
+            "scene_3b": {
+                // Platzhalter Bild (Grünlich - Erfolg)
+                img: "https://via.placeholder.com/320x240/00AA00/FFFFFF?text=SZENE+3B:+FLYER+JOB",
+                text: "Ein Typ gibt dir Flyer und 20 Dollar. 'Verteil das.' Glück gehabt!",
+                choices: [
+                    { text: "Zum Hotel gehen", target: "scene_4" }
+                ]
+            },
+            "scene_4": {
+                img: "https://via.placeholder.com/320x240/880088/FFFFFF?text=SZENE+4:+HOTEL",
+                text: "Luxus-Hotel. Der Doorman schaut streng. 'NO ROOMS' Schild.",
+                choices: [
+                    { text: "Zum Hostel", target: "scene_5a" },
+                    { text: "Bluffen: Gast spielen", target: "scene_5b" }
+                ]
+            },
+            "scene_5a": { // GAME OVER
+                img: "https://via.placeholder.com/320x240/AA0000/FFFFFF?text=GAME+OVER:+HOSTEL",
+                text: "Alle Hostels sind voll. Die Nacht verschluckt dich.",
+                choices: [
+                    { text: "NEUSTART", target: "start" }
+                ]
+            },
+            "scene_5b": {
+                img: "https://via.placeholder.com/320x240/008888/FFFFFF?text=SZENE+5B:+HAUSMEISTER",
+                text: "Du schleichst rein. Ein Hausmeister hält dich an: 'Ah, die neue Aushilfe!'",
+                choices: [
+                    { text: "Ihm helfen", target: "scene_6a" }
+                ]
+            },
+            // ... (Für die restlichen Szenen habe ich das gleiche Prinzip angewendet, 
+            // damit der Code nicht zu lang wird, aber das Prinzip ist klar: Jede Szene hat ein 'img')
+             "scene_6a": { img: "https://via.placeholder.com/320x240/333/FFF?text=SZENE+6A", text: "Glühbirnen wechseln. Er nickt.", choices: [{ text: "Weiter", target: "scene_6b" }] },
+             "scene_6b": { img: "https://via.placeholder.com/320x240/444/FFF?text=SZENE+6B", text: "Aufzug reparieren. Er läuft wieder.", choices: [{ text: "Weiter", target: "scene_6c" }] },
+             "scene_6c": { img: "https://via.placeholder.com/320x240/555/FFF?text=SZENE+6C", text: "Koffer schleppen. Du bist fertig.", choices: [{ text: "In den Keller", target: "scene_7" }] },
+             "scene_7": { img: "https://via.placeholder.com/320x240/666/FFF?text=SZENE+7", text: "Heizungskeller. Du schläfst ein.", choices: [{ text: "Schlafen...", target: "scene_9" }] },
+             "scene_9": { img: "https://via.placeholder.com/320x240/777/FFF?text=SZENE+9", text: "ALARM! Security. Kumpel geschnappt.", choices: [{ text: "Erklären", target: "scene_10b" }, { text: "Bluffen: POLIZEI!", target: "scene_10a" }] },
+             "scene_10b": { img: "https://via.placeholder.com/320x240/A00/FFF?text=GAME+OVER", text: "Keiner glaubt dir. Handschellen.", choices: [{ text: "NEUSTART", target: "start" }] },
+             "scene_10a": { img: "https://via.placeholder.com/320x240/0A0/FFF?text=WIN!", text: "Du zeigst auf dein Ohr. 'Einsatzleitung!' Sie lassen euch laufen.", choices: [{ text: "ENDE GENIESSEN", target: "scene_11" }] },
+             "scene_11": { img: "https://via.placeholder.com/320x240/FFD700/000?text=ENDE!", text: "Was für eine Nacht. Ihr lauft in den Sonnenaufgang.", choices: [{ text: "NOCHMAL?", target: "start" }] }
+        };
+
+        // Variablen
+        const storyText = document.getElementById('story-text');
+        const sceneImage = document.getElementById('scene-image');
+        const choicesContainer = document.getElementById('choices-container');
+        const startOverlay = document.getElementById('start-overlay');
+        const powerLight = document.querySelector('.power-light');
+        let typeWriterTimeout;
+
+        // Start Klick
+        startOverlay.addEventListener('click', () => {
+            startOverlay.style.display = 'none';
+            powerLight.classList.add('on');
+            playSound(); // Start Sound
+            loadScene('start');
+        });
+
+        // Szene laden
+        function loadScene(sceneId) {
+            const scene = scenes[sceneId];
+            
+            // HIER PASSIERT DER BILDWECHSEL
+            if(scene.img && scene.img !== "") {
+                // Setzt das neue Bild als Hintergrund
+                sceneImage.style.backgroundImage = `url('${scene.img}')`;
+            } else {
+                // Fallback falls was schief läuft
+                sceneImage.style.backgroundImage = 'none';
+                sceneImage.style.backgroundColor = '#111'; 
+            }
+
+            // Text Animation
+            storyText.innerHTML = "";
+            choicesContainer.innerHTML = "";
+            clearTimeout(typeWriterTimeout);
+            
+            let i = 0;
+            function typeWriter() {
+                if (i < scene.text.length) {
+                    storyText.innerHTML += scene.text.charAt(i);
+                    i++;
+                    typeWriterTimeout = setTimeout(typeWriter, 30);
+                } else {
+                    showChoices(scene.choices);
+                }
+            }
+            typeWriter();
+        }
+
+        // Entscheidungs-Buttons
+        function showChoices(choices) {
+            choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.innerText = choice.text;
+                btn.onclick = () => {
+                    playSound();
+                    loadScene(choice.target);
+                };
+                choicesContainer.appendChild(btn);
+            });
+        }
+
+        // Sound Effekt (generiert, keine Datei nötig!)
+        function playSound() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'square';
+            osc.frequency.value = 600;
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.1);
+            osc.stop(ctx.currentTime + 0.1);
+        }
+    </script>
+</body>
+</html>
