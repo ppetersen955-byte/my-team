@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lost in New York – Retro Pixel Adventure</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --bg-screen: #1b2b1b;
+      --bg-console: #8b8f8c;
+      --accent: #c4d48a;
+      --text: #e5f4d7;
+      --danger: #ff5c5c;
+      --success: #7cff7c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #222 0%, #000 60%);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text);
+    }
+
+    .console {
+      position: relative;
+      background: linear-gradient(145deg, #9c9f9c, #7c807d);
+      border-radius: 24px;
+      padding: 20px 20px 32px;
+      box-shadow:
+        0 20px 40px rgba(0,0,0,0.8),
+        inset 0 0 0 2px rgba(255,255,255,0.15);
+      max-width: 480px;
+      width: 100%;
+    }
+
+    /* oben „Pseudo-Marke“, aber ohne echten Namen */
+    .console-header {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 8px;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      opacity: 0.6;
+    }
+
+    .screen {
+      background: var(--bg-screen);
+      border-radius: 12px;
+      padding: 10px;
+      border: 4px solid #101710;
+      box-shadow:
+        inset 0 0 0 2px rgba(0,0,0,0.8),
+        0 0 0 1px rgba(255,255,255,0.1);
+      position: relative;
+      aspect-ratio: 4 / 3;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      overflow: hidden;
+    }
+
+    .scanlines::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.15) 50%,
+        transparent 50%
+      );
+      background-size: 100% 2px;
+      pointer-events: none;
+      opacity: 0.5;
+      mix-blend-mode: soft-light;
+    }
+
+    .scene-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      opacity: 0.8;
+    }
+
+    .scene-image-wrapper {
+      flex: 1;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 2px solid #111;
+      background: #243324;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .scene-image {
+      image-rendering: pixelated;
+      max-width: 100%;
+      max-height: 100%;
+      display: block;
+    }
+
+    .scene-text {
+      font-family: "Courier New", monospace;
+      font-size: 11px;
+      line-height: 1.3;
+      background: rgba(0,0,0,0.55);
+      padding: 4px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(0,0,0,0.9);
+    }
+
+    .choices {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 2px;
+    }
+
+    .choice-btn {
+      font-family: "Courier New", monospace;
+      font-size: 11px;
+      padding: 3px 4px;
+      text-align: left;
+      border-radius: 4px;
+      border: 1px solid #192519;
+      background: #2a3e2a;
+      color: var(--text);
+      cursor: pointer;
+      transition: transform 0.05s, box-shadow 0.05s, background 0.1s;
+      white-space: normal;
+    }
+
+    .choice-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 0 #0b100b;
+      background: #324a32;
+    }
+
+    .choice-btn:active {
+      transform: translateY(1px);
+      box-shadow: none;
+      background: #223322;
+    }
+
+    .choice-btn--danger {
+      background: #4a2323;
+      border-color: #2a1010;
+    }
+
+    .choice-btn--danger:hover {
+      background: #5a2828;
+    }
+
+    .status-banner {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-family: "Courier New", monospace;
+      font-size: 9px;
+      padding: 2px 4px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .status-banner--gameover {
+      background: var(--danger);
+      color: #200000;
+    }
+
+    .status-banner--win {
+      background: var(--success);
+      color: #002000;
+    }
+
+    .console-controls {
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-size: 10px;
+      opacity: 0.7;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .round-btn {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ff6b8a, #c01637);
+      box-shadow: 0 2px 0 #5a0b1e;
+    }
+
+    .round-btn:nth-child(2) {
+      background: radial-gradient(circle at 30% 30%, #ffd36b, #d68c08);
+      box-shadow: 0 2px 0 #7a5202;
+    }
+
+    .speaker {
+      display: flex;
+      gap: 3px;
+    }
+
+    .speaker div {
+      width: 3px;
+      height: 18px;
+      border-radius: 999px;
+      background: #3a3d3b;
+    }
+
+    @media (max-width: 520px) {
+      .console {
+        transform: scale(0.95);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="console">
+    <div class="console-header">HANDHELD ADVENTURE SYSTEM</div>
+
+    <div class="screen scanlines">
+      <div id="statusBanner"></div>
+      <div class="scene-title" id="sceneTitle"></div>
+      <div class="scene-image-wrapper">
+        <!-- Platzhalter-Bild, wird per JS ersetzt -->
+        <img id="sceneImage" class="scene-image" src="" alt="Szene" />
+      </div>
+      <div class="scene-text" id="sceneText"></div>
+      <div class="choices" id="choices"></div>
+    </div>
+
+    <div class="console-controls">
+      <div>LOST IN NEW YORK – PIXEL ADVENTURE</div>
+      <div class="button-row">
+        <div class="round-btn" title="A"></div>
+        <div class="round-btn" title="B"></div>
+        <div class="speaker">
+          <div></div><div></div><div></div><div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hintergrundmusik (du musst audio/theme.mp3 bereitstellen) -->
+  <audio id="bg-music" src="audio/theme.mp3" loop></audio>
+
+  <script>
+    // --- Szenendefinition ---------------------------------------------
+    // Jede Szene: id, title, image, text, type, choices[]
+    // type: "normal" | "gameover" | "win"
+
+    const scenes = {
+      start: {
+        id: "start",
+        type: "normal",
+        title: "Startbildschirm",
+        image: "images/start.png", // eigenes Bild erzeugen
+        text:
+          "Willkommen bei 'Lost in New York – Retro Pixel Adventure'.\\n\\n" +
+          "Ein Abenteuer im Stil alter Handheld-Spiele.\\n\\n" +
+          "Drücke START, um im Central Park aufzuwachen.",
+        choices: [
+          { text: "▶ START", next: "park_bench" }
+        ]
+      },
+
+      park_bench: {
+        id: "park_bench",
+        type: "normal",
+        title: "Central Park – Früher Morgen",
+        image: "images/park_bench.png",
+        text:
+          "Du wachst benommen auf einer Parkbank im Central Park auf. " +
+          "Dein Kopf dröhnt und du hast keine Ahnung, wie du hier gelandet bist.\\n\\n" +
+          "In deiner Hosentasche findest du dein Smartphone – der Akku ist komplett leer.",
+        choices: [
+          {
+            text: "Zum Schnellrestaurant gehen und nach Strom fragen",
+            next: "fastfood"
+          },
+          {
+            text: "In die U-Bahn gehen und dort eine Steckdose suchen",
+            next: "subway_gameover"
+          }
+        ]
+      },
+
+      // U-Bahn – Game Over
+      subway_gameover: {
+        id: "subway_gameover",
+        type: "gameover",
+        title: "U-Bahn – Pech gehabt",
+        image: "images/subway.png",
+        text:
+          "Du steigst in einen U-Bahn-Waggon. Es ist düster, ein paar zwielichtige Gestalten sitzen verteilt.\\n\\n" +
+          "Du fragst nach einer Lademöglichkeit. Einer grinst: 'Gib mal her, ich zeig dir die einzige Steckdose...'\\n\\n" +
+          "Du reichst ihm dein Handy – im nächsten Moment springt er auf und rennt davon. " +
+          "Dein Smartphone ist weg. Dein Abenteuer endet hier.",
+        choices: [
+          {
+            text: "◀ Nochmal von vorne beginnen",
+            next: "park_bench"
+          }
+        ]
+      },
+
+      // Fast-Food-Szene – guter Weg
+      fastfood: {
+        id: "fastfood",
+        type: "normal",
+        title: "Schnellrestaurant",
+        image: "images/fastfood.png",
+        text:
+          "Du betrittst ein Schnellrestaurant. An der Kasse stehen ein paar schräg aussehende Typen.\\n\\n" +
+          "Sie mustern dich, sehen, wie fertig du aussiehst – und werden überraschend freundlich. " +
+          "Sie spendieren dir etwas zu essen und zeigen dir eine Steckdose.\\n\\n" +
+          "Du schließt dein Smartphone an. Nach einer Weile ist der Akku wieder voll genug, um weitermachen zu können.",
+        choices: [
+          {
+            text: "Im Laden bleiben und nach einem Job fragen",
+            next: "fastfood_job"
+          },
+          {
+            text: "Wieder auf die Straße gehen und draußen nach einem Job suchen",
+            next: "street_flyer"
+          }
+        ]
+      },
+
+      fastfood_job: {
+        id: "fastfood_job",
+        type: "normal",
+        title: "Kein Job im Laden",
+        image: "images/fastfood_manager.png",
+        text:
+          "Du sprichst den Filialleiter an und fragst nach einem Job – egal ob Küche oder Theke.\\n\\n" +
+          "Er seufzt und erklärt dir freundlich, dass gerade niemand gebraucht wird.\\n\\n" +
+          "Ohne Job gehst du wieder hinaus auf die Straße.",
+        choices: [
+          {
+            text: "Weiter auf der Straße nach Möglichkeiten suchen",
+            next: "street_flyer"
+          }
+        ]
+      },
+
+      street_flyer: {
+        id: "street_flyer",
+        type: "normal",
+        title: "Straßenecke – Flyerjob",
+        image: "images/street_flyer.png",
+        text:
+          "Du läufst durch die Straßen von New York. Zwischen hohen Häusern und Leuchtreklamen siehst du einen Typen, " +
+          "der mit einem Stapel Flyer ziemlich genervt aussieht.\\n\\n" +
+          "Er fragt dich ohne großes Smalltalk: 'Willst du übernehmen? 20 Dollar, wenn du den Rest verteilst. Ich will Feierabend.'\\n\\n" +
+          "Du nimmst den Stapel, verteilst die Flyer und bekommst tatsächlich die 20 Dollar in die Hand gedrückt.",
+        choices: [
+          {
+            text: "Mit deinen 20 Dollar ein Hotel suchen",
+            next: "hotel_front"
+          }
+        ]
+      },
+
+      hotel_front: {
+        id: "hotel_front",
+        type: "normal",
+        title: "Vor einem Hotel",
+        image: "images/hotel_front.png",
+        text:
+          "Mit deinen 20 Dollar in der Tasche findest du ein größeres Hotel. " +
+          "Drinnen hoffst du auf ein freies Zimmer.\\n\\n" +
+          "An der Rezeption wirst du jedoch enttäuscht: 'Leider sind wir komplett ausgebucht.'\\n\\n" +
+          "Draußen wird es langsam dunkel und kühl. Du willst heute Nacht nicht auf der Straße bleiben.",
+        choices: [
+          {
+            text: "Einen scheinbaren Hotelgast fragen, ob er dich 'mitsmuggeln' kann",
+            next: "housekeeper_offer"
+          },
+          {
+            text: "Mit dem aufgeladenen Smartphone nach einem Hostel suchen",
+            next: "hostel_gameover"
+          }
+        ]
+      },
+
+      hostel_gameover: {
+        id: "hostel_gameover",
+        type: "gameover",
+        title: "Hostels – Alles voll",
+        image: "images/hostel_full.png",
+        text:
+          "Du suchst mit deinem Smartphone nach Hostels. Auf der Karte sieht es zuerst vielversprechend aus, " +
+          "doch jedes Haus, das du ansteuerst, ist überfüllt.\\n\\n" +
+          "Die Nacht bricht endgültig herein. Du läufst stundenlang durch die Stadt, wirst müde, frierst und verlierst völlig die Orientierung.\\n\\n" +
+          "Irgendwann merkst du: Das war keine gute Entscheidung.",
+        choices: [
+          {
+            text: "◀ Noch einmal versuchen – zurück zum Hotel",
+            next: "hotel_front"
+          },
+          {
+            text: "⬅ Ganz von vorne anfangen (Central Park)",
+            next: "park_bench"
+          }
+        ]
+      },
+
+      housekeeper_offer: {
+        id: "housekeeper_offer",
+        type: "normal",
+        title: "Der angebliche Hotelgast",
+        image: "images/housekeeper.png",
+        text:
+          "Du sprichst einen Mann an, den du für einen Hotelgast hältst. " +
+          "Er lacht kurz und sagt: 'Ich bin hier der Hausmeister.'\\n\\n" +
+          "Dann macht er dir ein Angebot: 'Wenn du mir ein bisschen hilfst, hab ich unten im Heizungskeller eine alte Matratze. " +
+          "Es ist warm, ruhig und sicher. Keine schlechte Nacht für jemanden ohne Zimmer.'",
+        choices: [
+          {
+            text: "Dem Hausmeister helfen",
+            next: "task_bulbs"
+          }
+        ]
+      },
+
+      task_bulbs: {
+        id: "task_bulbs",
+        type: "normal",
+        title: "Glühbirnen wechseln",
+        image: "images/task_bulbs.png",
+        text:
+          "Du hilfst dem Hausmeister, ein paar defekte Glühbirnen auf den Fluren zu wechseln. " +
+          "Mit jeder Lampe wird das Hotel ein Stück heller.\\n\\n" +
+          "Der Hausmeister nickt zufrieden: 'Nicht schlecht. Zwei Aufgaben noch.'",
+        choices: [
+          {
+            text: "Beim reparieren des Aufzugs helfen",
+            next: "task_elevator"
+          }
+        ]
+      },
+
+      task_elevator: {
+        id: "task_elevator",
+        type: "normal",
+        title: "Aufzug reparieren",
+        image: "images/task_elevator.png",
+        text:
+          "Zusammen mit dem Hausmeister kümmerst du dich um einen klemmenden Aufzug. " +
+          "Alte Technik, viele Geräusche – doch am Ende fährt die Kabine wieder.\\n\\n" +
+          "'Gut gemacht', meint er. 'Nur noch Koffer schleppen, dann hast du dir die Matratze verdient.'",
+        choices: [
+          {
+            text: "Koffer für Gäste nach oben tragen",
+            next: "task_luggage"
+          }
+        ]
+      },
+
+      task_luggage: {
+        id: "task_luggage",
+        type: "normal",
+        title: "Koffer schleppen",
+        image: "images/task_luggage.png",
+        text:
+          "Ein Kofferträger ist ausgefallen. Also übernimmst du seinen Job für den Abend. " +
+          "Drei schwere Koffer, mehrere Stockwerke – dein Rücken meldet sich deutlich.\\n\\n" +
+          "Gegen 00:30 Uhr klopft dir der Hausmeister auf die Schulter: 'Genug für heute. Komm mit, du hast dir den Platz im Heizungskeller verdient.'",
+        choices: [
+          {
+            text: "Mit in den Heizungskeller gehen",
+            next: "heating_room"
+          }
+        ]
+      },
+
+      heating_room: {
+        id: "heating_room",
+        type: "normal",
+        title: "Heizungskeller",
+        image: "images/heating_room.png",
+        text:
+          "Der Hausmeister führt dich in den Heizungskeller. Es ist warm, das Brummen der Leitungen wirkt fast beruhigend. " +
+          "In einer Ecke liegt eine alte, aber halbwegs brauchbare Matratze.\\n\\n" +
+          "Du legst dich hin. Die Erschöpfung holt dich ein, deine Augen werden schwer...",
+        choices: [
+          {
+            text: "Versuchen zu schlafen",
+            next: "heating_sleep"
+          }
+        ]
+      },
+
+      heating_sleep: {
+        id: "heating_sleep",
+        type: "normal",
+        title: "Zwischen Schlaf und Lärm",
+        image: "images/heating_sleep.png",
+        text:
+          "Gerade als du wegdämmerst, hörst du plötzlich lautes Geschrei aus den oberen Etagen. " +
+          "Stimmen, hektische Schritte, jemand scheint sehr aufgebracht zu sein.\\n\\n" +
+          "Du liegst auf der warmen Matratze und musst dich entscheiden.",
+        choices: [
+          {
+            text: "Im warmen Bett bleiben und versuchen, es zu ignorieren",
+            next: "rat_forces"
+          },
+          {
+            text: "Dem Geschrei nachgehen und nachsehen, was los ist",
+            next: "security_hall"
+          }
+        ]
+      },
+
+      rat_forces: {
+        id: "rat_forces",
+        type: "normal",
+        title: "Ungebetener Besuch",
+        image: "images/rat.png",
+        text:
+          "Du beschließt, einfach liegen zu bleiben. 'Wird schon nichts sein', denkst du.\\n\\n" +
+          "In dem Moment spürst du etwas über deinen Fuß huschen. Eine Ratte rennt über deine Zehen und verschwindet im Dunkeln. " +
+          "Dir vergeht schlagartig die Lust auf gemütliches Liegen.\\n\\n" +
+          "Genervt richtest du dich auf. Wenn du schon nicht schlafen kannst, willst du wenigstens wissen, was dort oben passiert.",
+        choices: [
+          {
+            text: "Dem Geschrei nachgehen",
+            next: "security_hall"
+          }
+        ]
+      },
+
+      security_hall: {
+        id: "security_hall",
+        type: "normal",
+        title: "Flur mit Security",
+        image: "images/security_hall.png",
+        text:
+          "Noch halb schlaftrunken stolperst du in einen Hotelflur. Vor einem Nebenraum stehen vier riesige Security-Leute. " +
+          "Mit ihnen zusammen der Hoteldirektor, der gerade jemanden zur Rede stellt.\\n\\n" +
+          "Die Security dreht sich zu dir um. Der Direktor fragt streng: 'Wer sind Sie?'\\n\\n" +
+          "Du erkennst die Person, die im Nebenzimmer festgehalten wird – es ist ein Kumpel von dir.",
+        choices: [
+          {
+            text: "Dich spontan als Polizist ausgeben und behaupten, du suchst deinen Kumpel schon lange",
+            next: "pretend_cop_win"
+          },
+          {
+            text: "Versuchen, den Direktor zu überzeugen, dass alles ein Missverständnis ist",
+            next: "director_gameover"
+          }
+        ]
+      },
+
+      pretend_cop_win: {
+        id: "pretend_cop_win",
+        type: "win",
+        title: "Gerettet!",
+        image: "images/pretend_cop.png",
+        text:
+          "Du fasst all deinen Mut zusammen, tippst dir ans Ohr, als hättest du ein Funkgerät, und sagst mit sicherer Stimme: " +
+          "'Hier ist Einsatzleitung. Wir suchen diesen Mann schon die ganze Nacht. Ich nehme ihn jetzt mit, mein Team wartet oben.'\\n\\n" +
+          "Die Security schaut irritiert, aber der Direktor scheint dir zu glauben. Zögerlich lassen sie deinen Kumpel los.\\n\\n" +
+          "Wenig später steht ihr beide draußen vor dem Hotel. Stück für Stück kommt die Erinnerung zurück: " +
+          "Ihr hattet eine durchzechte Partynacht in New York. Irgendwann habt ihr euch im Central Park verloren – " +
+          "deshalb bist du auf der Parkbank aufgewacht.\\n\\n" +
+          "Du hast deinen Freund gerettet und die Nacht überstanden.",
+        choices: [
+          {
+            text: "✨ Nochmal spielen – zurück in den Central Park",
+            next: "park_bench"
+          }
+        ]
+      },
+
+      director_gameover: {
+        id: "director_gameover",
+        type: "gameover",
+        title: "Schlechtes Timing",
+        image: "images/director_gameover.png",
+        text:
+          "Du versuchst, dem Hoteldirektor ruhig zu erklären, dass alles nur ein Missverständnis ist. " +
+          "Doch je mehr du redest, desto skeptischer wird er.\\n\\n" +
+          "'Dann warten wir jetzt lieber auf die richtige Polizei', sagt er schließlich. " +
+          "Kurz darauf erscheinen echte Beamte, stellen Fragen – und finden deine Geschichte alles andere als überzeugend.\\n\\n" +
+          "Am Ende werdet ihr beide mitgenommen. Dein Abenteuer endet auf der Rückbank eines Streifenwagens.",
+        choices: [
+          {
+            text: "◀ Zurück zum Flur mit der Security",
+            next: "security_hall"
+          },
+          {
+            text: "⬅ Ganz von vorne beginnen (Central Park)",
+            next: "park_bench"
+          }
+        ]
+      }
+    };
+
+    // --- Spiellogik ----------------------------------------------------
+
+    const sceneTitleEl = document.getElementById("sceneTitle");
+    const sceneImageEl = document.getElementById("sceneImage");
+    const sceneTextEl = document.getElementById("sceneText");
+    const choicesEl = document.getElementById("choices");
+    const statusBannerEl = document.getElementById("statusBanner");
+    const musicEl = document.getElementById("bg-music");
+
+    let currentSceneId = "start";
+
+    function renderScene(sceneId) {
+      const scene = scenes[sceneId];
+      if (!scene) {
+        console.error("Unbekannte Szene:", sceneId);
+        return;
+      }
+      currentSceneId = sceneId;
+
+      // Status-Banner
+      statusBannerEl.className = "status-banner";
+      statusBannerEl.textContent = "";
+      if (scene.type === "gameover") {
+        statusBannerEl.classList.add("status-banner--gameover");
+        statusBannerEl.textContent = "GAME OVER";
+      } else if (scene.type === "win") {
+        statusBannerEl.classList.add("status-banner--win");
+        statusBannerEl.textContent = "ERFOLG";
+      }
+
+      sceneTitleEl.textContent = scene.title || "";
+      sceneImageEl.src = scene.image || "";
+      sceneImageEl.alt = scene.title || "Szene";
+
+      // Zeilenumbrüche im Text
+      sceneTextEl.textContent = "";
+      const parts = scene.text.split("\\n");
+      parts.forEach((line, idx) => {
+        sceneTextEl.appendChild(document.createTextNode(line));
+        if (idx < parts.length - 1) {
+          sceneTextEl.appendChild(document.createElement("br"));
+        }
+      });
+
+      // Buttons neu aufbauen
+      choicesEl.innerHTML = "";
+      (scene.choices || []).forEach(choice => {
+        const btn = document.createElement("button");
+        btn.className = "choice-btn";
+        // Danger-Style für offensichtliche Risk-Choices optional:
+        if (scene.type === "gameover") {
+          btn.classList.add("choice-btn--danger");
+        }
+        btn.textContent = choice.text;
+        btn.addEventListener("click", () => {
+          if (choice.next) {
+            renderScene(choice.next);
+          }
+        });
+        choicesEl.appendChild(btn);
+      });
+    }
+
+    function startMusic() {
+      if (!musicEl) return;
+      musicEl.volume = 0.6;
+      musicEl.play().catch(() => {
+        // Autoplay blockiert – dann beim ersten Klick erneut versuchen
+      });
+    }
+
+    // Beim Laden Startszene anzeigen
+    renderScene(currentSceneId);
+
+    // Musik beim ersten Klick auf irgendeine Choice starten
+    document.addEventListener("click", function onFirstClick() {
+      startMusic();
+      document.removeEventListener("click", onFirstClick);
+    });
+  </script>
+</body>
+</html>
