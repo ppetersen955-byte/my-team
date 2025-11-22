@@ -299,7 +299,7 @@
     </div>
     <div class="text" id="description">
       Tippe die Kreise an, bevor sie dein Herz erreichen. Jeder Tipp ist ein „Nein“ zur Lüge.
-      Das Spiel läuft, bis eine Anfechtung dein Herz berührt – oder du 100 Angriffe abgewehrt hast.
+      Das Spiel läuft, bis eine Anfechtung dein Herz berührt – oder du 99 Angriffe abgewehrt hast.
       Ab 20, 50 und 70 wird es spürbar schwerer.
     </div>
 
@@ -313,7 +313,7 @@
     </div>
 
     <div class="status-row">
-      <div>Abgewehrt: <strong id="blocked-count">0</strong> / 100</div>
+      <div>Abgewehrt: <strong id="blocked-count">0</strong> / 99</div>
       <div>Getroffen: <strong id="missed-count">0</strong></div>
     </div>
 
@@ -335,7 +335,7 @@
 </div>
 
 <script>
-  const targetBlocks = 100;
+  const targetBlocks = 99;
 
   const enemiesPool = [
     // Feind / Satan
@@ -387,6 +387,7 @@
   let missed = 0;
 
   const playfield = document.getElementById("playfield");
+  const heartEl = document.getElementById("heart");
   const titleEl = document.getElementById("title");
   const descEl = document.getElementById("description");
   const badgeLabelEl = document.getElementById("badge-label");
@@ -432,7 +433,7 @@
     startBtn.disabled = false;
     startLabelEl.textContent = "Nochmal spielen";
     resultTextEl.textContent =
-      "Glückwunsch! Du hast 100 Angriffe abgewehrt.\n\n" +
+      "Glückwunsch! Du hast 99 Angriffe abgewehrt.\n\n" +
       "Du hast die Anfechtungen auf dein Herz erfolgreich abgeschmettert.\n" +
       "Gott ist bei dir – nicht, weil du im Spiel gut bist, sondern weil du ihm vertraust.";
   }
@@ -456,8 +457,7 @@
   }
 
   function getSpawnDelay() {
-    // Stufenweise Steigerung:
-    // 0–19: langsam, 20–49: schneller, 50–69: noch schneller, 70–100: sehr dicht
+    // Stufen: 0–19, 20–49, 50–69, 70–99
     if (blocked < 20) return 1100;
     if (blocked < 50) return 800;
     if (blocked < 70) return 550;
@@ -480,13 +480,12 @@
     badgeLabelEl.textContent = "Spiel läuft";
     descEl.textContent =
       "Tippe die Angriffe an, bevor sie dein Herz erreichen. Ab 20, 50 und 70 wird es immer dichter und chaotischer.\n" +
-      "Sobald eine Anfechtung dein Herz berührt, ist die Runde vorbei. Wenn du 100 schaffst, hast du gewonnen.";
+      "Sobald eine Anfechtung dein Herz berührt, ist die Runde vorbei. Wenn du 99 schaffst, hast du gewonnen.";
 
     scheduleNextSpawn();
   }
 
   function choosePattern() {
-    // Je mehr abgewehrt, desto mehr Zickzack/Welle
     const d = blocked;
     const r = Math.random();
     if (d < 20) {
@@ -510,7 +509,7 @@
     const centerX = 50;
     const centerY = 50;
 
-    // Startposition außen am Rand
+    // Startposition am Rand
     const side = Math.floor(Math.random() * 4); // 0 top, 1 right, 2 bottom, 3 left
     let startX, startY;
     const margin = 8;
@@ -561,8 +560,8 @@
       intervalId: null
     };
 
-    const steps = 90;      // mehr Schritte = langsamer
-    const tickMs = 60;     // Bewegung alle 60 ms
+    const steps = 90;
+    const tickMs = 60;
     let currentStep = 0;
 
     function move() {
@@ -591,12 +590,24 @@
       el.style.left = enemyObj.x + "%";
       el.style.top = enemyObj.y + "%";
 
-      const dx = enemyObj.x - centerX;
-      const dy = enemyObj.y - centerY;
+      // >>> HARTER CUT: echte Pixel-Kollision zwischen Kreisen
+      const heartRect = heartEl.getBoundingClientRect();
+      const enemyRect = el.getBoundingClientRect();
+
+      const heartCenterX = heartRect.left + heartRect.width / 2;
+      const heartCenterY = heartRect.top + heartRect.height / 2;
+      const enemyCenterX = enemyRect.left + enemyRect.width / 2;
+      const enemyCenterY = enemyRect.top + enemyRect.height / 2;
+
+      const dx = enemyCenterX - heartCenterX;
+      const dy = enemyCenterY - heartCenterY;
       const dist = Math.sqrt(dx * dx + dy * dy);
 
-      // HARTE CUT-SCHRANKE: etwas größerer Radius, damit nichts "durchrutscht"
-      if (dist < 8) {
+      const heartRadius = heartRect.width / 2;
+      const enemyRadius = enemyRect.width / 2;
+
+      if (dist <= heartRadius + enemyRadius) {
+        // Kreise berühren sich → sofort Game Over
         clearInterval(enemyObj.intervalId);
         if (!enemyObj.hit && gameRunning) {
           enemyObj.hit = true;
@@ -606,11 +617,11 @@
           setTimeout(() => {
             if (el.parentNode) el.remove();
             gameOverLose();
-          }, 120);
+          }, 80);
         }
       }
 
-      // Sicherheitsabschaltung
+      // Sicherheitsabschaltung, falls irgendwas hängen bleibt
       if (currentStep > steps + 30) {
         clearInterval(enemyObj.intervalId);
         if (el.parentNode) el.remove();
