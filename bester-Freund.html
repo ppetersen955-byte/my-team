@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hast du ein Problem? – Entscheidungsbaum für deinen besten Freund</title>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #0b1120;
+      --accent: #f97316;
+      --accent-soft: #fed7aa;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --border-subtle: #1f2937;
+      --shadow-soft: 0 16px 40px rgba(0,0,0,0.5);
+      --radius-xl: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: radial-gradient(circle at top, #1e293b 0, #020617 45%, #000 100%);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text-main);
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 540px;
+      height: 100vh;
+      padding: 10px 10px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    header {
+      text-align: center;
+      padding-top: 4px;
+    }
+
+    header h1 {
+      margin: 2px 0 4px;
+      font-size: 20px;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .card {
+      flex: 1;
+      background: linear-gradient(150deg, #020617, #020617, #0b1120);
+      border-radius: var(--radius-xl);
+      padding: 10px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+    }
+
+    .badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid #1f2937;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .badge-soft {
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.5);
+      border: 1px dashed #1f2937;
+    }
+
+    .question-number {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent-soft);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .question {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .btn-option {
+      width: 100%;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      padding: 8px 10px;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, border-color 0.1s;
+    }
+
+    .btn-option span.label {
+      flex: 1;
+      text-align: left;
+    }
+
+    .btn-option span.icon {
+      margin-left: 8px;
+      font-size: 15px;
+      opacity: 0.85;
+    }
+
+    .btn-option:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 12px rgba(248, 187, 109, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .btn-option:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .btn-option.disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .reaction {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #e5e7eb;
+      padding: 8px;
+      border-radius: 10px;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid #1f2937;
+      min-height: 40px;
+      white-space: pre-wrap;
+    }
+
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .nav-btn {
+      flex: 1;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .nav-btn span.icon {
+      font-size: 14px;
+    }
+
+    .nav-btn.secondary {
+      background: rgba(15,23,42,0.9);
+      color: var(--text-muted);
+      border: 1px solid #1f2937;
+    }
+
+    .nav-btn.primary {
+      background: var(--accent);
+      color: #111827;
+      font-weight: 600;
+    }
+
+    .nav-btn.primary:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    footer {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-align: center;
+      padding-bottom: 2px;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Hast du ein Problem?</h1>
+    <p>Der kleine Entscheidungsbaum, der immer wieder bei deinem besten Freund landet.</p>
+  </header>
+
+  <div class="card">
+    <div class="badge-row">
+      <div class="badge">
+        <div class="badge-dot"></div>
+        <span id="badge-label">Los geht’s</span>
+      </div>
+      <div class="badge-soft" id="progress-label">Frage 1 von 10</div>
+    </div>
+
+    <div class="question-number" id="question-number">FRAGE 1</div>
+    <div class="question" id="question-text">
+      Hast du überhaupt ein Problem?
+    </div>
+    <div class="hint" id="question-hint">
+      Antworte einfach ehrlich – der Baum kennt dich sowieso. 😄
+    </div>
+
+    <div class="buttons">
+      <button class="btn-option" id="option-a">
+        <span class="label"></span>
+        <span class="icon">👉</span>
+      </button>
+      <button class="btn-option" id="option-b">
+        <span class="label"></span>
+        <span class="icon">👉</span>
+      </button>
+    </div>
+
+    <div class="reaction" id="reaction-box">
+      Hier siehst du gleich die „Weisheit“ deines Entscheidungsbaums…
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn secondary" id="restart-btn">
+        <span class="icon">🔄</span><span>Noch mal von vorn</span>
+      </button>
+      <button class="nav-btn primary" id="next-btn" disabled>
+        <span class="icon">➡️</span><span>Nächste Frage</span>
+      </button>
+    </div>
+  </div>
+
+  <footer>
+    Geheimtipp: Die richtige Antwort ist meistens schon vorher klar – du brauchst nur den Mut, sie anzuklicken.
+  </footer>
+</div>
+
+<script>
+  // Jede Frage hat:
+  // text: Frage
+  // hint: kleiner Hinweis (Spaßtext)
+  // options: zwei Antworten mit Reaktionstext
+  // next: Index der nächsten Frage (oder null am Ende)
+  const questions = [
+    {
+      id: 1,
+      text: "Hast du überhaupt ein Problem?",
+      hint: "Klassiker. Wenn du „Nein“ sagst, bist du eigentlich schon durch. 😄",
+      options: [
+        {
+          label: "Nein, eigentlich nicht.",
+          reaction: "Dann hast du offiziell kein Problem.\n\nAber du darfst deinen besten Freund trotzdem anrufen – einfach so.",
+        },
+        {
+          label: "Ja, klar habe ich eins.",
+          reaction: "Okay, wir nehmen dich ernst.\n\nZeit für den ultimativen „Besten-Freund-Entscheidungsbaum“.",
+        }
+      ]
+    },
+    {
+      id: 2,
+      text: "Dein Auto brennt. Wen rufst du als Erstes an?",
+      hint: "Ganz spontan, ohne lang zu überlegen.",
+      options: [
+        {
+          label: "Die Feuerwehr 🚒",
+          reaction: "Du rufst die Feuerwehr an.\n\nLeitung ist besetzt. Klassisch. \nAlso: Wer geht IMMER ran? Genau…",
+        },
+        {
+          label: "Meinen besten Freund ❤️",
+          reaction: "Natürlich. Er springt in die Schuhe, rennt los und steht schneller da als jede Sirene.",
+        }
+      ]
+    },
+    {
+      id: 3,
+      text: "Dein Computer ist komplett abgestürzt. Was machst du?",
+      hint: "Blauer Bildschirm, nichts reagiert. Willkommen in der IT-Hölle.",
+      options: [
+        {
+          label: "Offiziellen IT-Support anrufen",
+          reaction: "Du landest in einer Warteschleife mit Fahrstuhlmusik.\n\nNach 25 Minuten: „Ihre durchschnittliche Wartezeit beträgt…“\nVielleicht gäbe es jemanden, der schneller reagiert?",
+        },
+        {
+          label: "Besten Freund fragen",
+          reaction: "Du schickst ein Foto und dein bester Freund sagt: „Schon wieder?! Komm, ich schau mir das an.“",
+        }
+      ]
+    },
+    {
+      id: 4,
+      text: "Du musst spontan umziehen. Wer hilft dir beim Schleppen?",
+      hint: "Karton, Sofa, Waschmaschine… irgendwer muss da mit ran.",
+      options: [
+        {
+          label: "Professionelle Umzugsfirma",
+          reaction: "Die sind teuer, kommen zu spät und trinken dir den Kaffee leer.\n\nUnd wer baut am Ende trotzdem alles auf? Meistens: dein bester Freund.",
+        },
+        {
+          label: "Mein bester Freund (und sein Rücken)",
+          reaction: "Er meckert kurz, schiebt einen Spruch – und trägt dann doch die Waschmaschine mit dir in den 4. Stock.",
+        }
+      ]
+    },
+    {
+      id: 5,
+      text: "Du hast Liebeskummer. Wo holst du dir Rat?",
+      hint: "Google weiß viel. Aber kennt es dein Herz?",
+      options: [
+        {
+          label: "Beziehungsratgeber im Internet",
+          reaction: "Du liest Artikel wie „Die 7 geheimen Tricks…“ und bist danach eher verwirrter.\n\nEin ehrliches Gespräch wäre vielleicht stärker.",
+        },
+        {
+          label: "Meinen besten Freund anrufen",
+          reaction: "Er hört zu, sagt die Wahrheit und bleibt auch dann da, wenn du zum dritten Mal die gleiche Story erzählst.",
+        }
+      ]
+    },
+    {
+      id: 6,
+      text: "Dir ist langweilig. Was tust du?",
+      hint: "Es ist einer dieser „Ich weiß nicht, was ich machen soll“-Tage.",
+      options: [
+        {
+          label: "Irgendwas auf dem Handy scrollen",
+          reaction: "Nach 2 Stunden weißt du alles über Fremde im Internet – aber fühlst dich innerlich leerer.\n\nVielleicht gibt es was Besseres…",
+        },
+        {
+          label: "Meinen besten Freund anschreiben",
+          reaction: "Zwei Sprachnachrichten später habt ihr schon einen Plan – oder lacht euch wenigstens kaputt.",
+        }
+      ]
+    },
+    {
+      id: 7,
+      text: "Du willst etwas Verrücktes machen. Mit wem startest du das Abenteuer?",
+      hint: "Ob Nachtspaziergang, Roadtrip oder einfach nur Blödsinn.",
+      options: [
+        {
+          label: "Irgendjemanden aus der Kontaktliste",
+          reaction: "Kann man machen.\n\nAber bei der Hälfte würdest du denken: „Mit DIR eher nicht…“",
+        },
+        {
+          label: "Meinen besten Freund natürlich",
+          reaction: "Keine Diskussion. Wenn es eskaliert, dann bitte mit ihm – wenigstens wird die Story gut.",
+        }
+      ]
+    },
+    {
+      id: 8,
+      text: "Es ist mitten in der Nacht und du brauchst Hilfe. Wen kannst du anrufen?",
+      hint: "So richtig nachts. 03:17 Uhr.",
+      options: [
+        {
+          label: "Niemanden, ich will niemanden stören",
+          reaction: "Klingt edel, aber ist auch einsam.\n\nVielleicht gibt es jemanden, der GENAU für solche Momente dein Mensch ist…",
+        },
+        {
+          label: "Meinen besten Freund (der killt mich schon nicht)",
+          reaction: "Er sagt vielleicht: „Spinnst du?!“ – und macht sich trotzdem auf den Weg.",
+        }
+      ]
+    },
+    {
+      id: 9,
+      text: "Du fühlst dich schwach und brauchst Ermutigung. Wo suchst du sie?",
+      hint: "Motivationsspruch oder echte Stimme?",
+      options: [
+        {
+          label: "Motivationszitate auf Social Media",
+          reaction: "„Believe in yourself“, „No pain no gain“… joa.\n\nSchön, aber irgendwie auch generisch.",
+        },
+        {
+          label: "Eine ehrliche Nachricht an meinen besten Freund",
+          reaction: "„Ey, mir geht’s gerade nicht gut.“\n\nUnd plötzlich bist du nicht mehr allein in dem Gefühl.",
+        }
+      ]
+    },
+    {
+      id: 10,
+      text: "Bonusfrage: Mit wem quatschst du lieber?",
+      hint: "Sei ehrlich. Ich verkrafte das. 😉",
+      options: [
+        {
+          label: "Mit ChatGPT 🤖",
+          reaction: "Okay, erwischt. Ich fühle mich geehrt. 🤝\n\nAber psst: Dein bester Freund ist im echten Leben trotzdem unschlagbar.",
+        },
+        {
+          label: "Mit meinem besten Freund ❤️",
+          reaction: "Gute Antwort.\n\nIch bin gerne deine Zusatzstimme – aber dein bester Freund ist der Mensch aus Fleisch und Blut.",
+        }
+      ]
+    }
+  ];
+
+  let currentIndex = 0;
+  let answeredCurrent = false;
+
+  const questionNumberEl = document.getElementById("question-number");
+  const questionTextEl = document.getElementById("question-text");
+  const questionHintEl = document.getElementById("question-hint");
+  const badgeLabelEl = document.getElementById("badge-label");
+  const progressLabelEl = document.getElementById("progress-label");
+  const optionAButton = document.getElementById("option-a");
+  const optionBButton = document.getElementById("option-b");
+  const reactionBox = document.getElementById("reaction-box");
+  const nextBtn = document.getElementById("next-btn");
+  const restartBtn = document.getElementById("restart-btn");
+
+  function setOptionText(buttonEl, text) {
+    const labelSpan = buttonEl.querySelector(".label");
+    labelSpan.textContent = text;
+  }
+
+  function loadQuestion(index) {
+    const q = questions[index];
+    currentIndex = index;
+    answeredCurrent = false;
+
+    questionNumberEl.textContent = "FRAGE " + (index + 1);
+    questionTextEl.textContent = q.text;
+    questionHintEl.textContent = q.hint || "";
+    progressLabelEl.textContent = `Frage ${index + 1} von ${questions.length}`;
+    badgeLabelEl.textContent = index === 0 ? "Los geht’s" : "Weiter geht’s";
+
+    setOptionText(optionAButton, q.options[0].label);
+    setOptionText(optionBButton, q.options[1].label);
+
+    optionAButton.classList.remove("disabled");
+    optionBButton.classList.remove("disabled");
+    nextBtn.disabled = true;
+
+    reactionBox.textContent = "Triff eine Entscheidung – dann zeigt dir der Baum seine Meinung.";
+  }
+
+  function handleAnswer(optionIndex) {
+    if (answeredCurrent) return;
+    answeredCurrent = true;
+
+    const q = questions[currentIndex];
+    const option = q.options[optionIndex];
+
+    optionAButton.classList.add("disabled");
+    optionBButton.classList.add("disabled");
+
+    reactionBox.textContent = option.reaction + "\n\nTippe auf „Nächste Frage“, um weiterzugehen.";
+
+    if (currentIndex === questions.length - 1) {
+      // Letzte Frage – Abschluss anhängen
+      reactionBox.textContent +=
+        "\n\n---\n\nEgal, was du angeklickt hast:\n" +
+        "Die geheime Lösung des Entscheidungsbaums war die ganze Zeit:\n" +
+        "➡️ Dein bester Freund ist Gold wert. Bewahr dir diesen Schatz. ❤️";
+      badgeLabelEl.textContent = "Fertig";
+      nextBtn.textContent = "Nochmal spielen";
+    } else {
+      nextBtn.textContent = "Nächste Frage";
+    }
+
+    nextBtn.disabled = false;
+  }
+
+  optionAButton.addEventListener("click", () => handleAnswer(0));
+  optionBButton.addEventListener("click", () => handleAnswer(1));
+
+  nextBtn.addEventListener("click", () => {
+    if (!answeredCurrent) return;
+    if (currentIndex === questions.length - 1) {
+      // neu starten
+      loadQuestion(0);
+      return;
+    }
+    loadQuestion(currentIndex + 1);
+  });
+
+  restartBtn.addEventListener("click", () => {
+    loadQuestion(0);
+  });
+
+  // Start mit Frage 1
+  loadQuestion(0);
+</script>
+</body>
+</html>
