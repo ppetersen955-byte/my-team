@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wut-Abbau – Herzschutz-Spiel</title>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #0b1120;
+      --accent-orange: #f97316;
+      --accent-blue: #38bdf8;
+      --accent-green: #22c55e;
+      --accent-rose: #fb7185;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --border-subtle: #1f2937;
+      --shadow-soft: 0 16px 40px rgba(0,0,0,0.5);
+      --radius-xl: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: radial-gradient(circle at top, #1e293b 0, #020617 50%, #000 100%);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text-main);
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 480px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    header {
+      text-align: center;
+      padding-top: 4px;
+    }
+
+    header h1 {
+      margin: 4px 0;
+      font-size: 22px;
+      letter-spacing: 0.03em;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .card {
+      background: linear-gradient(145deg, #020617, #020617, #0b1120);
+      border-radius: var(--radius-xl);
+      padding: 12px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.8);
+      border: 1px solid #1f2937;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent-rose);
+    }
+
+    .badge-soft {
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.5);
+      border: 1px dashed #1f2937;
+    }
+
+    .title {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .text {
+      font-size: 13px;
+      color: #e5e7eb;
+      white-space: pre-wrap;
+    }
+
+    .playfield-wrapper {
+      margin-top: 4px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .playfield {
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      aspect-ratio: 1 / 1;
+      border-radius: 24px;
+      background: radial-gradient(circle at center, #020617 0, #020617 50%, #020617 100%);
+      overflow: hidden;
+      border: 1px solid #111827;
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.7);
+    }
+
+    .heart {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 90px;
+      height: 90px;
+      border-radius: 999px;
+      background: radial-gradient(circle at top, #f97316 0, #b91c1c 60%, #450a0a 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 24px rgba(248,113,113,0.8);
+      border: 2px solid rgba(248,250,252,0.4);
+    }
+
+    .heart-emoji {
+      font-size: 26px;
+      margin-bottom: 2px;
+    }
+
+    .heart-label {
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #fee2e2;
+    }
+
+    .enemy {
+      position: absolute;
+      width: 76px;
+      height: 76px;
+      border-radius: 999px;
+      background: radial-gradient(circle at top, rgba(248,113,113,0.2), rgba(15,23,42,0.95));
+      border: 1px solid rgba(248,113,113,0.7);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      text-align: center;
+      padding: 6px;
+      box-shadow: 0 0 20px rgba(248,113,113,0.5);
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    .enemy-emoji {
+      font-size: 16px;
+      margin-bottom: 1px;
+    }
+
+    .enemy-label {
+      line-height: 1.2;
+    }
+
+    .enemy.hit {
+      background: radial-gradient(circle at center, rgba(34,197,94,0.7), rgba(15,23,42,1));
+      border-color: rgba(74,222,128,0.9);
+      box-shadow: 0 0 20px rgba(74,222,128,0.7);
+    }
+
+    .enemy.missed {
+      background: radial-gradient(circle at center, rgba(248,113,113,0.8), rgba(15,23,42,1));
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .status-row strong {
+      color: var(--text-main);
+    }
+
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .nav-btn {
+      flex: 1;
+      border-radius: 999px;
+      padding: 8px 10px;
+      font-size: 13px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .nav-btn span.icon {
+      font-size: 14px;
+    }
+
+    .nav-btn.secondary {
+      background: rgba(15,23,42,0.9);
+      color: var(--text-muted);
+      border: 1px solid #1f2937;
+    }
+
+    .nav-btn.primary {
+      background: var(--accent-orange);
+      color: #111827;
+      font-weight: 600;
+    }
+
+    .nav-btn.primary:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    footer {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      padding-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Wut-Abbau – Herzschutz</h1>
+    <p>Tippe die Anfechtungen weg, bevor sie dein Herz treffen.</p>
+  </header>
+
+  <div class="card">
+    <div class="badge-row">
+      <div class="badge">
+        <div class="badge-dot"></div>
+        <span id="badge-label">Bereit?</span>
+      </div>
+      <div class="badge-soft" id="secondary-label"></div>
+    </div>
+
+    <div class="title" id="title">
+      Dein Herz ist in der Mitte. Drum herum fliegen Lügen, Selbsthass und Anfechtungen.
+    </div>
+    <div class="text" id="description">
+      Tippe die Kreise an, bevor sie dein Herz erreichen. Du kannst nichts „perfekt“ machen – es geht nur darum, bewusst zu merken: Das ist nicht die Wahrheit, das ist Angriff.
+    </div>
+
+    <div class="playfield-wrapper">
+      <div class="playfield" id="playfield">
+        <div class="heart" id="heart">
+          <div class="heart-emoji">❤️</div>
+          <div class="heart-label">MEIN HERZ</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="status-row">
+      <div>Abgewehrt: <strong id="blocked-count">0</strong></div>
+      <div>Getroffen: <strong id="missed-count">0</strong></div>
+    </div>
+
+    <div class="text" id="result-text"></div>
+
+    <div class="nav-row">
+      <button class="nav-btn secondary" id="info-btn">
+        <span class="icon">ℹ️</span><span>Erklärung</span>
+      </button>
+      <button class="nav-btn primary" id="start-btn">
+        <span class="icon">▶️</span><span id="start-label">Spiel starten</span>
+      </button>
+    </div>
+  </div>
+
+  <footer>
+    Die Angriffe sind laut – aber Gottes Stimme ist tiefer als jede Lüge.
+  </footer>
+</div>
+
+<script>
+  const enemies = [
+    { label: "Selbsthass", emoji: "💣" },
+    { label: "Anfechtung", emoji: "🔥" },
+    { label: "Lüge des Feindes", emoji: "🗯️" },
+    { label: "Verdammnis", emoji: "⚡" },
+    { label: "Angst-Gedanke", emoji: "😨" },
+    { label: "Anklage", emoji: "👿" },
+    { label: "Ich bin nichts wert", emoji: "💔" },
+    { label: "Das wird nie besser", emoji: "🌑" }
+  ];
+
+  let gameRunning = false;
+  let spawnInterval = null;
+  let activeEnemies = [];
+  let blocked = 0;
+  let missed = 0;
+  let wavesSpawned = 0;
+  const maxWaves = 15;
+  const spawnDelay = 1100; // ms
+
+  const playfield = document.getElementById("playfield");
+  const titleEl = document.getElementById("title");
+  const descEl = document.getElementById("description");
+  const badgeLabelEl = document.getElementById("badge-label");
+  const secondaryLabelEl = document.getElementById("secondary-label");
+  const blockedCountEl = document.getElementById("blocked-count");
+  const missedCountEl = document.getElementById("missed-count");
+  const resultTextEl = document.getElementById("result-text");
+  const startBtn = document.getElementById("start-btn");
+  const startLabelEl = document.getElementById("start-label");
+  const infoBtn = document.getElementById("info-btn");
+
+  function resetGameState() {
+    gameRunning = false;
+    blocked = 0;
+    missed = 0;
+    wavesSpawned = 0;
+    blockedCountEl.textContent = "0";
+    missedCountEl.textContent = "0";
+    resultTextEl.textContent = "";
+    secondaryLabelEl.textContent = "";
+    clearEnemies();
+  }
+
+  function clearEnemies() {
+    activeEnemies.forEach(e => clearInterval(e.intervalId));
+    activeEnemies.forEach(e => {
+      if (e.el && e.el.parentNode) {
+        e.el.remove();
+      }
+    });
+    activeEnemies = [];
+  }
+
+  function startGame() {
+    resetGameState();
+    gameRunning = true;
+    startBtn.disabled = true;
+    startLabelEl.textContent = "Läuft...";
+    badgeLabelEl.textContent = "Spiel läuft";
+    descEl.textContent =
+      "Tippe die Anfechtungen an, bevor sie dein Herz erreichen. Du musst nicht alles schaffen – jeder bewusste Klick ist ein „Nein“ zur Lüge.";
+
+    spawnInterval = setInterval(() => {
+      if (!gameRunning) return;
+      if (wavesSpawned >= maxWaves) {
+        clearInterval(spawnInterval);
+        spawnInterval = null;
+        // Warte noch kurz, bis die letzten Kreise entweder geklickt oder angekommen sind
+        setTimeout(() => {
+          if (gameRunning) {
+            endGame();
+          }
+        }, 2500);
+        return;
+      }
+      spawnEnemy();
+      wavesSpawned++;
+      secondaryLabelEl.textContent = `Welle ${wavesSpawned} / ${maxWaves}`;
+    }, spawnDelay);
+  }
+
+  function endGame() {
+    gameRunning = false;
+    startBtn.disabled = false;
+    startLabelEl.textContent = "Nochmal spielen";
+    clearInterval(spawnInterval);
+    spawnInterval = null;
+
+    clearEnemies();
+
+    let text = "";
+    if (blocked === 0 && missed === 0) {
+      text = "Du hast noch nichts abgewehrt – probier es gern nochmal. Dein Herz darf üben, „Nein“ zu sagen.";
+    } else if (blocked > 0 && missed === 0) {
+      text = `Sehr gut! Du hast ${blocked} Anfechtung(en) abgewehrt und keine ist an dein Herz gekommen. Gott freut sich nicht über deine Leistung, sondern über dein Vertrauen.`;
+    } else {
+      text =
+        `Du hast ${blocked} Anfechtung(en) bewusst abgewehrt. ` +
+        `${missed} sind trotzdem bei deinem Herzen gelandet.\n\nUnd genau dort, wo du es nicht geschafft hast, bleibt Jesus trotzdem für dich. Seine Wahrheit ist stärker als jede Lüge, die du verpasst hast.`;
+    }
+
+    resultTextEl.textContent = text;
+    badgeLabelEl.textContent = "Auswertung";
+  }
+
+  function spawnEnemy() {
+    const rect = playfield.getBoundingClientRect();
+    const size = 76; // enemy size
+    const centerX = 50;
+    const centerY = 50;
+
+    const side = Math.floor(Math.random() * 4); // 0 top, 1 right, 2 bottom, 3 left
+    let xPerc, yPerc;
+    const margin = 10;
+
+    if (side === 0) { // oben
+      xPerc = margin + Math.random() * (100 - 2 * margin);
+      yPerc = -5;
+    } else if (side === 1) { // rechts
+      xPerc = 105;
+      yPerc = margin + Math.random() * (100 - 2 * margin);
+    } else if (side === 2) { // unten
+      xPerc = margin + Math.random() * (100 - 2 * margin);
+      yPerc = 105;
+    } else { // links
+      xPerc = -5;
+      yPerc = margin + Math.random() * (100 - 2 * margin);
+    }
+
+    const enemyData = enemies[Math.floor(Math.random() * enemies.length)];
+    const el = document.createElement("div");
+    el.className = "enemy";
+    el.innerHTML = `
+      <div class="enemy-emoji">${enemyData.emoji}</div>
+      <div class="enemy-label">${enemyData.label}</div>
+    `;
+    playfield.appendChild(el);
+
+    el.style.left = xPerc + "%";
+    el.style.top = yPerc + "%";
+
+    const enemyObj = {
+      el,
+      x: xPerc,
+      y: yPerc,
+      hit: false,
+      intervalId: null
+    };
+
+    const steps = 35; // wie viele Schritte bis zur Mitte
+    let currentStep = 0;
+
+    function move() {
+      if (!gameRunning) {
+        clearInterval(enemyObj.intervalId);
+        if (el.parentNode) el.remove();
+        return;
+      }
+      currentStep++;
+
+      // Richtung zur Mitte
+      enemyObj.x += (centerX - enemyObj.x) / (steps - currentStep + 1);
+      enemyObj.y += (centerY - enemyObj.y) / (steps - currentStep + 1);
+
+      el.style.left = enemyObj.x + "%";
+      el.style.top = enemyObj.y + "%";
+
+      const dist = Math.abs(enemyObj.x - centerX) + Math.abs(enemyObj.y - centerY);
+
+      if (dist < 4) {
+        // am Herz angekommen
+        clearInterval(enemyObj.intervalId);
+        if (!enemyObj.hit) {
+          missed++;
+          missedCountEl.textContent = missed.toString();
+          el.classList.add("missed");
+        }
+        setTimeout(() => {
+          if (el.parentNode) el.remove();
+        }, 200);
+      }
+
+      if (currentStep > steps + 10) {
+        clearInterval(enemyObj.intervalId);
+        if (el.parentNode) el.remove();
+      }
+    }
+
+    enemyObj.intervalId = setInterval(move, 40);
+    activeEnemies.push(enemyObj);
+
+    el.addEventListener("click", () => {
+      if (!gameRunning) return;
+      if (enemyObj.hit) return;
+      enemyObj.hit = true;
+      blocked++;
+      blockedCountEl.textContent = blocked.toString();
+      el.classList.add("hit");
+      setTimeout(() => {
+        clearInterval(enemyObj.intervalId);
+        if (el.parentNode) el.remove();
+      }, 160);
+    });
+  }
+
+  infoBtn.addEventListener("click", () => {
+    titleEl.textContent = "Was hier eigentlich passiert:";
+    descEl.textContent =
+      "Die Kreise stehen für Gedanken und Anfechtungen: Lügen, Selbsthass, Stimmen des Feindes.\n\n" +
+      "Wenn du sie antippst, sagst du innerlich: „Nein. Das ist nicht Gottes Wahrheit über mich.“\n\n" +
+      "Auch wenn du nicht alle erwischst: Jesus bleibt bei dir. Das Spiel soll dir nur helfen, zu merken: " +
+      "Viele der harten Gedanken sind Angriffe – nicht deine Identität.";
+  });
+
+  startBtn.addEventListener("click", () => {
+    if (!gameRunning) {
+      startGame();
+    }
+  });
+</script>
+</body>
+</html>
