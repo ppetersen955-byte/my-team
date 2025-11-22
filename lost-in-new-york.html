@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost in New York - Pixel Adventure</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* --- CSS STYLES --- */
+        :root {
+            --gb-bg: #c0c0c0; /* Gameboy Grau */
+            --screen-bg: #0f380f; /* Gameboy Dunkelgrün */
+            --screen-light: #9bbc0f; /* Gameboy Hellgrün */
+            --text-color: #0f380f;
+            --accent: #8b0000;
+        }
+
+        body {
+            background-color: #202020;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Press Start 2P', cursive;
+            color: var(--text-color);
+        }
+
+        /* Der GameBoy Körper */
+        #gameboy {
+            background-color: var(--gb-bg);
+            width: 320px;
+            height: 580px;
+            border-radius: 20px 20px 40px 40px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Der Bildschirm-Rahmen */
+        .screen-bezel {
+            background-color: #555;
+            width: 260px;
+            height: 220px;
+            border-radius: 10px 10px 30px 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);
+        }
+
+        /* Der eigentliche Bildschirm */
+        #screen {
+            background-color: var(--screen-light);
+            width: 200px; /* Original: 160px skaliert */
+            height: 180px; /* Original: 144px skaliert */
+            border: 2px solid #333;
+            position: relative;
+            overflow: hidden;
+            image-rendering: pixelated;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Scanlines Effekt (optional für Retro Feeling) */
+        #screen::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 10;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* Bildbereich */
+        #scene-image {
+            width: 100%;
+            height: 100px;
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 10px;
+            text-align: center;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+
+        #scene-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none; /* Standardmäßig aus, bis Bilder da sind */
+        }
+
+        /* Textbereich unten */
+        #text-box {
+            flex: 1;
+            padding: 8px;
+            font-size: 8px;
+            line-height: 1.5;
+            border-top: 2px solid var(--text-color);
+            overflow-y: auto;
+        }
+
+        /* Steuerkreuz Deko */
+        .controls {
+            width: 100%;
+            height: 150px;
+            position: relative;
+        }
+        .d-pad {
+            width: 90px;
+            height: 90px;
+            position: absolute;
+            left: 20px;
+            top: 30px;
+        }
+        .d-pad div {
+            background-color: #333;
+            position: absolute;
+            border-radius: 3px;
+        }
+        .d-pad .h { width: 90px; height: 30px; top: 30px; left: 0; }
+        .d-pad .v { width: 30px; height: 90px; top: 0; left: 30px; }
+
+        /* Buttons A/B Deko */
+        .action-btns {
+            position: absolute;
+            right: 20px;
+            top: 50px;
+        }
+        .btn-circle {
+            width: 35px;
+            height: 35px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 10px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* Interaktions-Buttons (die echten Klick-Buttons) */
+        #choices-container {
+            position: absolute;
+            bottom: -60px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .game-btn {
+            background-color: #333;
+            color: white;
+            border: 2px solid #fff;
+            padding: 10px 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            cursor: pointer;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px #000;
+            transition: transform 0.1s;
+        }
+
+        .game-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 #000;
+        }
+
+        .game-btn:hover {
+            background-color: #555;
+        }
+
+        /* Start Button (Select/Start Deko) */
+        .start-select {
+            display: flex;
+            gap: 15px;
+            position: absolute;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .pill {
+            width: 40px;
+            height: 10px;
+            background-color: #666;
+            border-radius: 5px;
+            transform: rotate(-25deg);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="gameboy">
+        <div class="screen-bezel">
+            <div id="screen">
+                <div id="scene-image">
+                    <span id="placeholder-text">Lade...</span>
+                    </div>
+                <div id="text-box">
+                    Willkommen zu Lost in New York...
+                </div>
+            </div>
+        </div>
+
+        <div class="logo" style="align-self: flex-start; margin-left: 20px; font-size: 12px; color: #3030a0; margin-bottom: 10px;"><i>Nintendo</i> GAME BOY™</div>
+        
+        <div class="controls">
+            <div class="d-pad"><div class="h"></div><div class="v"></div></div>
+            <div class="action-btns">
+                <div class="btn-circle"></div>
+                <div class="btn-circle" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+        
+        <div class="start-select">
+            <div class="pill"></div>
+            <div class="pill"></div>
+        </div>
+
+        <div id="choices-container">
+            </div>
+    </div>
+
+    <script>
+        // --- SPIEL DATEN (Alle Szenen basierend auf deinem GDD) ---
+        const scenes = {
+            start: {
+                id: "start",
+                text: "Du wachst benommen auf einer Bank im Central Park auf. Handy-Akku ist leer. Nebel zieht auf.",
+                imageDesc: "Central Park, neblig, grüne Töne", // Beschreibung für Platzhalter
+                color: "#2c5c2c", // Hintergrundfarbe für Stimmung
+                choices: [
+                    { text: "Zum Fast-Food Laden", target: "fastfood" },
+                    { text: "Zur U-Bahn", target: "subway" }
+                ]
+            },
+            subway: {
+                id: "subway",
+                text: "Du fragst in der U-Bahn nach Strom. Ein Typ klaut dein Handy und rennt weg. GAME OVER.",
+                imageDesc: "Dunkle U-Bahn, kaltes Licht",
+                color: "#203040",
+                choices: [
+                    { text: "Neustart", target: "start" }
+                ]
+            },
+            fastfood: {
+                id: "fastfood",
+                text: "Die Typen sind nett. Du kannst dein Handy laden. Was nun?",
+                imageDesc: "Warmes Licht, Fast Food Restaurant",
+                color: "#8B4513",
+                choices: [
+                    { text: "Nach Job fragen", target: "manager" },
+                    { text: "Draußen suchen", target: "street" }
+                ]
+            },
+            manager: {
+                id: "manager",
+                text: "Manager: 'Sorry, kein Job frei.' Du musst wohl draußen suchen.",
+                imageDesc: "Manager in Küche, müde",
+                color: "#A0522D",
+                choices: [
+                    { text: "Weiter", target: "street" }
+                ]
+            },
+            street: {
+                id: "street",
+                text: "Ein genervter Typ gibt dir Flyer und 20 Dollar. 'Hier, mach Feierabend'.",
+                imageDesc: "Straßenkreuzung NYC Nacht",
+                color: "#555500",
+                choices: [
+                    { text: "Zum Hotel gehen", target: "hotel" }
+                ]
+            },
+            hotel: {
+                id: "hotel",
+                text: "Hotel ist ausgebucht. Doorman blockt dich ab. Du hast Geld, aber kein Zimmer.",
+                imageDesc: "Hotel Eingang Goldene Lichter",
+                color: "#DAA520",
+                choices: [
+                    { text: "Einschleusen (Gast fragen)", target: "janitor" },
+                    { text: "Hostel suchen (Handy)", target: "hostel_fail" }
+                ]
+            },
+            hostel_fail: {
+                id: "hostel_fail",
+                text: "Du irrst stundenlang durch NYC. Alles voll. Du verlierst die Orientierung. GAME OVER.",
+                imageDesc: "Handy Karte Rot Blinkend",
+                color: "#500000",
+                choices: [
+                    { text: "Neustart", target: "start" }
+                ]
+            },
+            janitor: {
+                id: "janitor",
+                text: "Der Gast ist Hausmeister! Er lässt dich im Heizungskeller schlafen, wenn du ihm hilfst.",
+                imageDesc: "Hausmeister mit Schlüsseln",
+                color: "#606060",
+                choices: [
+                    { text: "Arbeit erledigen", target: "quest" }
+                ]
+            },
+            quest: {
+                id: "quest",
+                text: "Du wechselst Glühbirnen und schleppst Koffer. Puh! 00:30 Uhr - ab in den Keller.",
+                imageDesc: "Pixel-Arbeitsszene",
+                color: "#404040",
+                choices: [
+                    { text: "Schlafen gehen", target: "basement" }
+                ]
+            },
+            basement: {
+                id: "basement",
+                text: "Im Heizungskeller ist es warm. Plötzlich: LAUTES GESCHREI draußen!",
+                imageDesc: "Dunkler Keller, roter Kessel",
+                color: "#300000",
+                choices: [
+                    { text: "Liegen bleiben", target: "rat" },
+                    { text: "Nachsehen", target: "security" }
+                ]
+            },
+            rat: {
+                id: "rat",
+                text: "Eine Ratte läuft über dein Gesicht! Du springst panisch auf und rennst zum Lärm.",
+                imageDesc: "Ratten Augen Pixel",
+                color: "#000000",
+                choices: [
+                    { text: "Weiter", target: "security" }
+                ]
+            },
+            security: {
+                id: "security",
+                text: "Security hält einen 'Einbrecher' fest. Es ist DEIN KUMPEL! Der Direktor fragt: 'Wer sind Sie?'",
+                imageDesc: "Hotelflur, Security, Kumpel",
+                color: "#FFD700",
+                choices: [
+                    { text: "Erklären (Missverständnis)", target: "bad_end" },
+                    { text: "Bluffen (Polizei)", target: "good_end" }
+                ]
+            },
+            bad_end: {
+                id: "bad_end",
+                text: "Keiner glaubt dir. Die echte Polizei kommt. Ihr landet in der Zelle. GAME OVER.",
+                imageDesc: "Gefängnisgitter",
+                color: "#202020",
+                choices: [
+                    { text: "Neustart", target: "start" }
+                ]
+            },
+            good_end: {
+                id: "good_end",
+                text: "Du tust so, als wärst du Cop. 'Ich nehme ihn mit!' Ihr entkommt lachend. GEWONNEN!",
+                imageDesc: "Sonnenaufgang NYC, Freunde",
+                color: "#008080",
+                choices: [
+                    { text: "Nochmal spielen", target: "start" }
+                ]
+            }
+        };
+
+        // --- ENGINE ---
+
+        const imgContainer = document.getElementById("scene-image");
+        const placeholderText = document.getElementById("placeholder-text");
+        const textBox = document.getElementById("text-box");
+        const choicesContainer = document.getElementById("choices-container");
+
+        // Audio Setup (Platzhalter)
+        // const bgMusic = new Audio('music.mp3'); 
+        // bgMusic.loop = true;
+
+        function showScene(sceneId) {
+            const scene = scenes[sceneId];
+            
+            // 1. Text aktualisieren
+            // Schreibmaschinen-Effekt simulieren (optional, hier einfach Text setzen)
+            textBox.innerText = scene.text;
+
+            // 2. Bild / Atmosphäre aktualisieren
+            // Wenn du echte Bilder hast, nutze: document.getElementById('real-image').src = `img/${sceneId}.png`;
+            imgContainer.style.backgroundColor = scene.color;
+            placeholderText.innerText = `[BILD: ${scene.imageDesc}]`;
+
+            // 3. Buttons generieren
+            choicesContainer.innerHTML = ""; // Alte Buttons löschen
+            
+            scene.choices.forEach(choice => {
+                const btn = document.createElement("button");
+                btn.classList.add("game-btn");
+                btn.innerText = choice.text;
+                btn.onclick = () => {
+                    // Musik starten beim ersten Klick (Browser Policy)
+                    // if (bgMusic.paused) bgMusic.play(); 
+                    showScene(choice.target);
+                };
+                choicesContainer.appendChild(btn);
+            });
+        }
+
+        // Spiel starten
+        showScene("start");
+
+    </script>
+</body>
+</html>
