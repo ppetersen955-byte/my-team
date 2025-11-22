@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEON CONCRETE '95</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <style>
+        /* === CSS DESIGN === */
+        :root {
+            --gb-bg: #c0c0c0;
+            --screen-bg: #000;
+            --text-color: #e0f8cf;
+            --ui-bg: #202020;
+        }
+
+        body {
+            background-color: #121212;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Press Start 2P', cursive;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Gameboy Gehäuse */
+        .gameboy-case {
+            background-color: var(--gb-bg);
+            padding: 20px;
+            border-radius: 10px 10px 40px 10px;
+            box-shadow: -5px 5px 20px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 300px;
+        }
+
+        .screen-border {
+            background-color: #555;
+            padding: 30px 35px;
+            border-radius: 10px 10px 30px 10px;
+            position: relative;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .power-light {
+            width: 8px;
+            height: 8px;
+            background-color: #333;
+            border-radius: 50%;
+            position: absolute;
+            top: 100px;
+            left: 10px;
+            transition: background-color 0.3s;
+            z-index: 20;
+        }
+
+        .power-light.on {
+            background-color: red;
+            box-shadow: 0 0 8px red;
+        }
+
+        .brand {
+            color: #303060;
+            font-size: 10px;
+            font-style: italic;
+            margin-top: 8px;
+            font-family: sans-serif;
+            font-weight: bold;
+        }
+
+        /* Bildschirm */
+        .screen {
+            width: 100%;
+            height: 220px;
+            background-color: var(--screen-bg);
+            border: 3px solid #333;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Overlay zum Starten */
+        #start-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #000;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #0f0;
+            text-align: center;
+            cursor: pointer;
+        }
+        #start-overlay h1 { font-size: 20px; margin-bottom: 10px; text-shadow: 2px 2px 0 #004400; }
+        #start-overlay p { font-size: 10px; animation: blink 1s infinite; }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* Das Bild */
+        #scene-image {
+            width: 100%;
+            height: 130px;
+            background-color: #111; /* Fallback wenn kein Bild da ist */
+            background-size: cover;
+            background-position: center;
+            image-rendering: pixelated;
+            border-bottom: 2px solid #fff;
+        }
+
+        /* Textbox */
+        .textbox {
+            flex: 1;
+            background-color: var(--ui-bg);
+            padding: 10px;
+            color: var(--text-color);
+            font-size: 9px;
+            line-height: 1.4;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Buttons */
+        button {
+            background: transparent;
+            border: none;
+            color: #aaa;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            padding: 5px 0;
+            cursor: pointer;
+            text-align: left;
+            width: 100%;
+            display: block;
+        }
+        button:hover { color: #fff; text-decoration: underline; }
+        button:before { content: "> "; }
+
+        /* Deko-Elemente unten */
+        .controls { display: flex; justify-content: space-between; width: 100%; padding: 0 10px; box-sizing: border-box; }
+        .d-pad { width: 70px; height: 70px; background: #333; clip-path: polygon(33% 0, 66% 0, 66% 33%, 100% 33%, 100% 66%, 66% 66%, 66% 100%, 33% 100%, 33% 66%, 0 66%, 0 33%, 33% 33%); }
+        .action-buttons { display: flex; gap: 10px; margin-top: 20px; }
+        .a-btn, .b-btn { width: 25px; height: 25px; background: #8b0000; border-radius: 50%; }
+        
+        /* Scanlines */
+        .scanlines {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.3) 50%);
+            background-size: 100% 4px; pointer-events: none; z-index: 10; opacity: 0.4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="gameboy-case">
+        <div class="screen-border">
+            <div class="power-light"></div>
+            <div class="screen">
+                <div id="start-overlay">
+                    <h1>NEON<br>CONCRETE<br>'95</h1>
+                    <p>CLICK TO START</p>
+                </div>
+                <div id="scene-image"></div> <div class="scanlines"></div>
+                <div class="textbox">
+                    <p id="story-text"></p>
+                    <div id="choices-container"></div>
+                </div>
+            </div>
+            <div class="brand">NINTENDO GAMEBOY TM</div>
+        </div>
+        <div class="controls">
+            <div class="d-pad"></div>
+            <div class="action-buttons">
+                <div class="b-btn"></div>
+                <div class="a-btn"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === JAVASCRIPT LOGIK ===
+
+        /* HINWEIS: Wenn du deine generierten Bilder hast, 
+           speichere sie in einem Ordner "images" und passe die Pfade unten an.
+           Beispiel: img: "images/bild1.png" 
+           Aktuell ist kein Bild hinterlegt, der Hintergrund bleibt dunkelgrau. */
+
+        const scenes = {
+            "start": {
+                img: "", 
+                text: "Morgengrauen im Central Park. Dein Handy ist leer. Du hast Hunger.",
+                choices: [
+                    { text: "Zum Fast-Food (Strom)", target: "scene_2a" },
+                    { text: "Zur U-Bahn (Wärme)", target: "scene_2b" }
+                ]
+            },
+            "scene_2a": {
+                img: "",
+                text: "Rote Sitzbänke. Dein Handy lädt langsam an der Wand.",
+                choices: [
+                    { text: "Chef nach Job fragen", target: "scene_3a" },
+                    { text: "Rausgehen & suchen", target: "scene_3b" }
+                ]
+            },
+            "scene_2b": { // GAME OVER
+                img: "",
+                text: "U-Bahn. Ein Typ zieht dir dein Handy ab. Alles ist vorbei.",
+                choices: [
+                    { text: "NEUSTART", target: "start" }
+                ]
+            },
+            "scene_3a": { 
+                img: "",
+                text: "Der Filialleiter lacht nur. 'Keine Jobs hier.'",
+                choices: [
+                    { text: "Zurück zur Straße", target: "scene_3b" }
+                ]
+            },
+            "scene_3b": {
+                img: "",
+                text: "Ein Typ gibt dir Flyer und 20 Dollar. 'Verteil das.' Glück gehabt!",
+                choices: [
+                    { text: "Zum Hotel gehen", target: "scene_4" }
+                ]
+            },
+            "scene_4": {
+                img: "",
+                text: "Luxus-Hotel. Der Doorman schaut streng. 'NO ROOMS' Schild.",
+                choices: [
+                    { text: "Zum Hostel", target: "scene_5a" },
+                    { text: "Bluffen: Gast spielen", target: "scene_5b" }
+                ]
+            },
+            "scene_5a": { // GAME OVER
+                img: "",
+                text: "Alle Hostels sind voll. Die Nacht verschluckt dich.",
+                choices: [
+                    { text: "NEUSTART", target: "start" }
+                ]
+            },
+            "scene_5b": {
+                img: "",
+                text: "Du schleichst rein. Ein Hausmeister hält dich an: 'Ah, die neue Aushilfe!'",
+                choices: [
+                    { text: "Ihm helfen", target: "scene_6a" }
+                ]
+            },
+            "scene_6a": {
+                img: "",
+                text: "Glühbirnen wechseln im dunklen Flur. Er nickt zufrieden.",
+                choices: [
+                    { text: "Weiter", target: "scene_6b" }
+                ]
+            },
+            "scene_6b": {
+                img: "",
+                text: "Aufzug reparieren. Funken fliegen. Aber er läuft wieder.",
+                choices: [
+                    { text: "Weiter", target: "scene_6c" }
+                ]
+            },
+            "scene_6c": {
+                img: "",
+                text: "Koffer schleppen. Du bist völlig fertig.",
+                choices: [
+                    { text: "In den Keller legen", target: "scene_7" }
+                ]
+            },
+            "scene_7": {
+                img: "",
+                text: "Heizungskeller. Warm. Du schläfst sofort auf einer Matratze ein.",
+                choices: [
+                    { text: "Schlafen...", target: "scene_9" }
+                ]
+            },
+            "scene_9": {
+                img: "",
+                text: "ALARM! Security weckt dich. Dein Kumpel wurde im Nebenraum geschnappt.",
+                choices: [
+                    { text: "Erklären", target: "scene_10b" },
+                    { text: "Bluffen: POLIZEI!", target: "scene_10a" }
+                ]
+            },
+            "scene_10b": { // GAME OVER
+                img: "",
+                text: "Keiner glaubt dir. Handschellen. Polizeisirenen.",
+                choices: [
+                    { text: "NEUSTART", target: "start" }
+                ]
+            },
+            "scene_10a": { // WIN
+                img: "",
+                text: "Du zeigst auf dein Ohr. 'Einsatzleitung!' Sie lassen euch laufen.",
+                choices: [
+                    { text: "ENDE GENIESSEN", target: "scene_11" }
+                ]
+            },
+            "scene_11": { // ENDE
+                img: "",
+                text: "Was für eine Nacht. Ihr lacht und lauft in den Sonnenaufgang.",
+                choices: [
+                    { text: "NOCHMAL?", target: "start" }
+                ]
+            }
+        };
+
+        // Variablen
+        const storyText = document.getElementById('story-text');
+        const sceneImage = document.getElementById('scene-image');
+        const choicesContainer = document.getElementById('choices-container');
+        const startOverlay = document.getElementById('start-overlay');
+        const powerLight = document.querySelector('.power-light');
+        let typeWriterTimeout;
+
+        // Start Klick
+        startOverlay.addEventListener('click', () => {
+            startOverlay.style.display = 'none';
+            powerLight.classList.add('on');
+            playSound(); // Start Sound
+            loadScene('start');
+        });
+
+        // Szene laden
+        function loadScene(sceneId) {
+            const scene = scenes[sceneId];
+            
+            // Bild Logik
+            if(scene.img && scene.img !== "") {
+                sceneImage.style.backgroundImage = `url('${scene.img}')`;
+            } else {
+                // Wenn kein Bild da ist, Standard-Hintergrund
+                sceneImage.style.backgroundImage = 'none';
+                sceneImage.style.backgroundColor = '#111'; 
+            }
+
+            // Text Animation
+            storyText.innerHTML = "";
+            choicesContainer.innerHTML = "";
+            clearTimeout(typeWriterTimeout);
+            
+            let i = 0;
+            function typeWriter() {
+                if (i < scene.text.length) {
+                    storyText.innerHTML += scene.text.charAt(i);
+                    i++;
+                    typeWriterTimeout = setTimeout(typeWriter, 30);
+                } else {
+                    showChoices(scene.choices);
+                }
+            }
+            typeWriter();
+        }
+
+        // Entscheidungs-Buttons
+        function showChoices(choices) {
+            choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.innerText = choice.text;
+                btn.onclick = () => {
+                    playSound();
+                    loadScene(choice.target);
+                };
+                choicesContainer.appendChild(btn);
+            });
+        }
+
+        // Sound Effekt (generiert, keine Datei nötig!)
+        function playSound() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'square';
+            osc.frequency.value = 600;
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.1);
+            osc.stop(ctx.currentTime + 0.1);
+        }
+    </script>
+</body>
+</html>
