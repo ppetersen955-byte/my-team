@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Insel der tausend Gefahren – Mini-Abenteuer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #020617;
+      color: #f9fafb;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      min-height: 100vh;
+    }
+    .app {
+      max-width: 600px;
+      width: 100%;
+      padding: 16px;
+    }
+    .card {
+      background: #0b1120;
+      border-radius: 12px;
+      border: 1px solid #1f2937;
+      padding: 16px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+    }
+    h1 {
+      font-size: 20px;
+      margin-top: 0;
+      text-align: center;
+    }
+    #section-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    #section-text {
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      margin-bottom: 12px;
+    }
+    .choices {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .choice-btn {
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      background: #111827;
+      color: #e5e7eb;
+      padding: 8px 12px;
+      font-size: 14px;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice-btn:hover {
+      border-color: #f97316;
+    }
+    .meta {
+      margin-top: 8px;
+      font-size: 11px;
+      color: #9ca3af;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="card">
+    <h1>Insel der tausend Gefahren – Mini</h1>
+    <div id="section-title"></div>
+    <div id="section-text"></div>
+    <div class="choices" id="choices"></div>
+    <div class="meta" id="meta"></div>
+  </div>
+</div>
+
+<script>
+  // Hier definierst du deine „Buch-Seiten“
+  const sections = {
+    start: {
+      title: "Der Strand",
+      text: "Du wachst an einem unbekannten Strand auf.\nDas Meer rauscht, der Kopf brummt.\n\nLinks führt ein schmaler Pfad in den Dschungel.\nRechts siehst du eine Klippe mit einer halb kaputten Treppe.",
+      choices: [
+        { label: "In den Dschungel gehen", goto: "dschungel" },
+        { label: "Zur Klippe gehen", goto: "klippe" }
+      ]
+    },
+    dschungel: {
+      title: "Der Dschungel",
+      text: "Der Dschungel ist laut, feucht und voller Geräusche.\nAuf einmal hörst du ein Knacken im Gebüsch.\n\nVor dir teilt sich der Weg.",
+      choices: [
+        { label: "Dem Geräusch folgen", goto: "falle" },
+        { label: "Schnell in die andere Richtung", goto: "hoehle" }
+      ]
+    },
+    klippe: {
+      title: "Die Klippe",
+      text: "Du steigst vorsichtig die alte Treppe hinauf.\nUnter dir bricht eine Stufe weg, aber du hältst dich fest.\n\nOben siehst du ein altes Fernrohr.",
+      choices: [
+        { label: "Durch das Fernrohr schauen", goto: "fernrohr" },
+        { label: "Lieber wieder nach unten", goto: "start" }
+      ]
+    },
+    falle: {
+      title: "Eine Falle!",
+      text: "Du trittst in eine alte Fallgrube.\nZum Glück ist sie nicht sehr tief – aber weiter kommst du hier nicht.\n\nDas Abenteuer endet hier… dieses Mal.",
+      choices: [
+        { label: "Nochmal von vorne", goto: "start" }
+      ]
+    },
+    hoehle: {
+      title: "Die Höhle",
+      text: "Du findest eine kleine Höhle.\nInnen liegt ein alter Rucksack mit einer Wasserflasche und einer Karte.\n\nDu fühlst dich plötzlich nicht mehr ganz so verloren.",
+      choices: [
+        { label: "Karte anschauen", goto: "karte" },
+        { label: "Mit Vorräten zurück zum Strand", goto: "start" }
+      ]
+    },
+    fernrohr: {
+      title: "Das Fernrohr",
+      text: "Durch das Fernrohr siehst du in der Ferne ein kleines Boot.\nEs kommt langsam näher.\n\nVielleicht ist das deine Chance, von der Insel runterzukommen.",
+      choices: [
+        { label: "Mit Armen wedeln und rufen", goto: "rettung" },
+        { label: "Dich verstecken, lieber weiter erkunden", goto: "dschungel" }
+      ]
+    },
+    karte: {
+      title: "Die Karte",
+      text: "Die Karte zeigt geheime Wege über die Insel.\nEin rotes X markiert eine Stelle in der Nähe des Strands.\n\n„Schatz? Gefahr? Oder beides?“, denkst du.",
+      choices: [
+        { label: "Zum roten X gehen", goto: "schatz" },
+        { label: "Lieber vorsichtig bleiben", goto: "start" }
+      ]
+    },
+    schatz: {
+      title: "Der Schatz",
+      text: "Du findest eine alte Kiste voller Goldmünzen.\nReicher als vorher – aber immer noch auf der Insel.\n\nManchmal löst Geld nicht alle Probleme.",
+      choices: [
+        { label: "Abspann: Noch mal spielen", goto: "start" }
+      ]
+    },
+    rettung: {
+      title: "Gerettet!",
+      text: "Das Boot sieht dich.\nJemand winkt zurück und steuert auf die Klippe zu.\n\nDu wirst von der Insel abgeholt.\n\nHappy End – zumindest in diesem Pfad.",
+      choices: [
+        { label: "Nochmal von vorne und andere Wege testen", goto: "start" }
+      ]
+    }
+  };
+
+  let currentKey = "start";
+
+  const titleEl = document.getElementById("section-title");
+  const textEl = document.getElementById("section-text");
+  const choicesEl = document.getElementById("choices");
+  const metaEl = document.getElementById("meta");
+
+  function renderSection(key) {
+    const section = sections[key];
+    currentKey = key;
+
+    titleEl.textContent = section.title;
+    textEl.textContent = section.text;
+    choicesEl.innerHTML = "";
+
+    section.choices.forEach(choice => {
+      const btn = document.createElement("button");
+      btn.className = "choice-btn";
+      btn.innerHTML = `<span class="label">${choice.label}</span><span class="icon">➡️</span>`;
+      btn.addEventListener("click", () => {
+        renderSection(choice.goto);
+      });
+      choicesEl.appendChild(btn);
+    });
+
+    metaEl.textContent = "Du spielst einen Mini-Pfad. Später kannst du hier Dutzende Abschnitte einbauen – wie im Buch.";
+  }
+
+  renderSection(currentKey);
+</script>
+</body>
+</html>
