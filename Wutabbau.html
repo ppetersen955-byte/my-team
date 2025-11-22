@@ -43,39 +43,42 @@
 
     .app {
       width: 100%;
-      max-width: 480px;
-      padding: 16px;
+      max-width: 550px;
+      height: 100vh;
+      padding: 10px 10px 6px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
     }
 
     header {
       text-align: center;
-      padding-top: 4px;
+      padding-top: 2px;
     }
 
     header h1 {
-      margin: 4px 0;
-      font-size: 22px;
+      margin: 2px 0;
+      font-size: 20px;
       letter-spacing: 0.03em;
     }
 
     header p {
       margin: 0;
-      font-size: 13px;
+      font-size: 12px;
       color: var(--text-muted);
     }
 
     .card {
+      flex: 1;
       background: linear-gradient(145deg, #020617, #020617, #0b1120);
       border-radius: var(--radius-xl);
-      padding: 12px;
+      padding: 8px;
       box-shadow: var(--shadow-soft);
       border: 1px solid var(--border-subtle);
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
+      min-height: 0;
     }
 
     .badge-row {
@@ -112,29 +115,32 @@
     }
 
     .title {
-      font-size: 17px;
+      font-size: 15px;
       font-weight: 600;
     }
 
     .text {
-      font-size: 13px;
+      font-size: 12px;
       color: #e5e7eb;
       white-space: pre-wrap;
     }
 
     .playfield-wrapper {
-      margin-top: 4px;
+      flex: 1;
       display: flex;
       justify-content: center;
+      align-items: stretch;
+      margin-top: 4px;
     }
 
     .playfield {
       position: relative;
       width: 100%;
-      max-width: 360px;
-      aspect-ratio: 1 / 1;
+      max-width: 530px;
+      height: 100%;
+      min-height: 260px;
       border-radius: 24px;
-      background: radial-gradient(circle at center, #020617 0, #020617 50%, #020617 100%);
+      background: radial-gradient(circle at center, #020617 0, #020617 45%, #020617 100%);
       overflow: hidden;
       border: 1px solid #111827;
       box-shadow: inset 0 0 40px rgba(0,0,0,0.7);
@@ -145,34 +151,34 @@
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      width: 90px;
-      height: 90px;
+      width: 110px;
+      height: 110px;
       border-radius: 999px;
       background: radial-gradient(circle at top, #f97316 0, #b91c1c 60%, #450a0a 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 24px rgba(248,113,113,0.8);
-      border: 2px solid rgba(248,250,252,0.4);
+      box-shadow: 0 0 30px rgba(248,113,113,0.9);
+      border: 2px solid rgba(248,250,252,0.5);
     }
 
     .heart-emoji {
-      font-size: 26px;
+      font-size: 30px;
       margin-bottom: 2px;
     }
 
     .heart-label {
       font-size: 11px;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       color: #fee2e2;
     }
 
     .enemy {
       position: absolute;
-      width: 76px;
-      height: 76px;
+      width: 80px;
+      height: 80px;
       border-radius: 999px;
       background: radial-gradient(circle at top, rgba(248,113,113,0.2), rgba(15,23,42,0.95));
       border: 1px solid rgba(248,113,113,0.7);
@@ -202,20 +208,21 @@
     .enemy.hit {
       background: radial-gradient(circle at center, rgba(34,197,94,0.7), rgba(15,23,42,1));
       border-color: rgba(74,222,128,0.9);
-      box-shadow: 0 0 20px rgba(74,222,128,0.7);
+      box-shadow: 0 0 22px rgba(74,222,128,0.8);
     }
 
     .enemy.missed {
-      background: radial-gradient(circle at center, rgba(248,113,113,0.8), rgba(15,23,42,1));
+      background: radial-gradient(circle at center, rgba(248,113,113,0.9), rgba(15,23,42,1));
+      border-color: rgba(248,113,113,1);
     }
 
     .status-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 12px;
+      font-size: 11px;
       color: var(--text-muted);
-      margin-top: 6px;
+      margin-top: 4px;
     }
 
     .status-row strong {
@@ -226,14 +233,14 @@
       display: flex;
       justify-content: space-between;
       gap: 8px;
-      margin-top: 8px;
+      margin-top: 6px;
     }
 
     .nav-btn {
       flex: 1;
       border-radius: 999px;
-      padding: 8px 10px;
-      font-size: 13px;
+      padding: 7px 10px;
+      font-size: 12px;
       border: none;
       cursor: pointer;
       display: inline-flex;
@@ -264,10 +271,10 @@
     }
 
     footer {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--text-muted);
       text-align: center;
-      padding-bottom: 4px;
+      padding-bottom: 2px;
     }
   </style>
 </head>
@@ -275,7 +282,7 @@
 <div class="app">
   <header>
     <h1>Wut-Abbau – Herzschutz</h1>
-    <p>Tippe die Anfechtungen weg, bevor sie dein Herz treffen.</p>
+    <p>Tippe die Angriffe weg, bevor sie dein Herz treffen.</p>
   </header>
 
   <div class="card">
@@ -288,10 +295,11 @@
     </div>
 
     <div class="title" id="title">
-      Dein Herz ist in der Mitte. Drum herum fliegen Lügen, Selbsthass und Anfechtungen.
+      Dein Herz ist in der Mitte. Drumherum fliegen Angriffe, Lügen und Selbsthass.
     </div>
     <div class="text" id="description">
-      Tippe die Kreise an, bevor sie dein Herz erreichen. Du kannst nichts „perfekt“ machen – es geht nur darum, bewusst zu merken: Das ist nicht die Wahrheit, das ist Angriff.
+      Tippe die Kreise an, bevor sie dein Herz erreichen. Jeder Tipp ist ein „Nein“ zur Lüge.
+      Das Spiel läuft, bis eine Anfechtung dein Herz berührt – oder du 999 Angriffe abgewehrt hast.
     </div>
 
     <div class="playfield-wrapper">
@@ -304,7 +312,7 @@
     </div>
 
     <div class="status-row">
-      <div>Abgewehrt: <strong id="blocked-count">0</strong></div>
+      <div>Abgewehrt: <strong id="blocked-count">0</strong> / 999</div>
       <div>Getroffen: <strong id="missed-count">0</strong></div>
     </div>
 
@@ -321,20 +329,54 @@
   </div>
 
   <footer>
-    Die Angriffe sind laut – aber Gottes Stimme ist tiefer als jede Lüge.
+    Die Angriffe sind laut – aber Gottes Wahrheit ist tiefer als jede Lüge.
   </footer>
 </div>
 
 <script>
-  const enemies = [
-    { label: "Selbsthass", emoji: "💣" },
-    { label: "Anfechtung", emoji: "🔥" },
-    { label: "Lüge des Feindes", emoji: "🗯️" },
+  const targetBlocks = 999;
+
+  const enemiesPool = [
+    // Feind / Satan
+    { label: "Satan – Ankläger", emoji: "👿" },
+    { label: "Feind – Lüge", emoji: "🗯️" },
+    { label: "Finsternis", emoji: "🌑" },
     { label: "Verdammnis", emoji: "⚡" },
-    { label: "Angst-Gedanke", emoji: "😨" },
-    { label: "Anklage", emoji: "👿" },
+    { label: "Anfechtung", emoji: "🔥" },
+
+    // Selbsthass / Identität
+    { label: "Selbsthass", emoji: "💣" },
     { label: "Ich bin nichts wert", emoji: "💔" },
-    { label: "Das wird nie besser", emoji: "🌑" }
+    { label: "Ich bin ein Versager", emoji: "📉" },
+    { label: "Keiner braucht mich", emoji: "🚫" },
+    { label: "Ich bin zu viel", emoji: "🧨" },
+
+    // Zweifel / Ungewissheit
+    { label: "Ungewissheit", emoji: "🌫️" },
+    { label: "Zweifel", emoji: "❓" },
+    { label: "Gott ist nicht da", emoji: "🚷" },
+    { label: "Das wird nie besser", emoji: "🕳️" },
+    { label: "Angst-Gedanke", emoji: "😨" },
+
+    // Todsünden / destruktiv
+    { label: "Stolz", emoji: "👑" },
+    { label: "Neid", emoji: "🧿" },
+    { label: "Zorn", emoji: "💥" },
+    { label: "Faulheit", emoji: "🛋️" },
+    { label: "Habgier", emoji: "💰" },
+    { label: "Völlerei", emoji: "🍖" },
+    { label: "Unreine Gedanken", emoji: "🩸" },
+
+    // Beziehung / Ablehnung
+    { label: "Du bist allein", emoji: "🚪" },
+    { label: "Keiner versteht dich", emoji: "🧊" },
+    { label: "Du nervst alle", emoji: "📵" },
+    { label: "Du bist schuld", emoji: "⚠️" },
+
+    // Extra
+    { label: "Es lohnt sich nicht", emoji: "🧨" },
+    { label: "Hoffnungslosigkeit", emoji: "🕯️" },
+    { label: "Chaos im Kopf", emoji: "🌪️" }
   ];
 
   let gameRunning = false;
@@ -342,9 +384,6 @@
   let activeEnemies = [];
   let blocked = 0;
   let missed = 0;
-  let wavesSpawned = 0;
-  const maxWaves = 15;
-  const spawnDelay = 1100; // ms
 
   const playfield = document.getElementById("playfield");
   const titleEl = document.getElementById("title");
@@ -358,11 +397,18 @@
   const startLabelEl = document.getElementById("start-label");
   const infoBtn = document.getElementById("info-btn");
 
+  function clearEnemies() {
+    activeEnemies.forEach(e => clearInterval(e.intervalId));
+    activeEnemies.forEach(e => {
+      if (e.el && e.el.parentNode) e.el.remove();
+    });
+    activeEnemies = [];
+  }
+
   function resetGameState() {
     gameRunning = false;
     blocked = 0;
     missed = 0;
-    wavesSpawned = 0;
     blockedCountEl.textContent = "0";
     missedCountEl.textContent = "0";
     resultTextEl.textContent = "";
@@ -370,14 +416,38 @@
     clearEnemies();
   }
 
-  function clearEnemies() {
-    activeEnemies.forEach(e => clearInterval(e.intervalId));
-    activeEnemies.forEach(e => {
-      if (e.el && e.el.parentNode) {
-        e.el.remove();
-      }
-    });
-    activeEnemies = [];
+  function gameOverWin() {
+    gameRunning = false;
+    if (spawnInterval) {
+      clearInterval(spawnInterval);
+      spawnInterval = null;
+    }
+    clearEnemies();
+    badgeLabelEl.textContent = "Sieg!";
+    startBtn.disabled = false;
+    startLabelEl.textContent = "Nochmal spielen";
+    resultTextEl.textContent =
+      `Sehr stark! Du hast ${targetBlocks} Angriffe bewusst abgewehrt.\n\n` +
+      `Nicht, weil du perfekt bist, sondern weil du gelernt hast: ` +
+      `Viele Gedanken sind Angriffe – und Gottes Wahrheit ist stärker.`;
+  }
+
+  function gameOverLose() {
+    gameRunning = false;
+    if (spawnInterval) {
+      clearInterval(spawnInterval);
+      spawnInterval = null;
+    }
+    clearEnemies();
+    badgeLabelEl.textContent = "Herz getroffen";
+    startBtn.disabled = false;
+    startLabelEl.textContent = "Nochmal spielen";
+
+    resultTextEl.textContent =
+      `Eine Anfechtung hat dein Herz getroffen.\n\n` +
+      `Das heißt NICHT, dass du verloren hast. Es heißt nur: Du bist Mensch.\n` +
+      `Genau dort, wo die Lüge getroffen hat, bleibt Jesus bei dir und spricht: ` +
+      `„Ich lasse dich nicht fallen.“`;
   }
 
   function startGame() {
@@ -387,76 +457,41 @@
     startLabelEl.textContent = "Läuft...";
     badgeLabelEl.textContent = "Spiel läuft";
     descEl.textContent =
-      "Tippe die Anfechtungen an, bevor sie dein Herz erreichen. Du musst nicht alles schaffen – jeder bewusste Klick ist ein „Nein“ zur Lüge.";
+      "Tippe die Angriffe an, bevor sie dein Herz erreichen. Sobald ein Angriff das Herz berührt, ist die Runde vorbei. Wenn du 999 Angriffe abwehrst, hast du gewonnen.";
+
+    const spawnDelay = 900; // neue Gegner etwa alle 0,9 s
 
     spawnInterval = setInterval(() => {
       if (!gameRunning) return;
-      if (wavesSpawned >= maxWaves) {
-        clearInterval(spawnInterval);
-        spawnInterval = null;
-        // Warte noch kurz, bis die letzten Kreise entweder geklickt oder angekommen sind
-        setTimeout(() => {
-          if (gameRunning) {
-            endGame();
-          }
-        }, 2500);
-        return;
-      }
       spawnEnemy();
-      wavesSpawned++;
-      secondaryLabelEl.textContent = `Welle ${wavesSpawned} / ${maxWaves}`;
+      secondaryLabelEl.textContent = `Abgewehrt: ${blocked} / ${targetBlocks}`;
     }, spawnDelay);
   }
 
-  function endGame() {
-    gameRunning = false;
-    startBtn.disabled = false;
-    startLabelEl.textContent = "Nochmal spielen";
-    clearInterval(spawnInterval);
-    spawnInterval = null;
-
-    clearEnemies();
-
-    let text = "";
-    if (blocked === 0 && missed === 0) {
-      text = "Du hast noch nichts abgewehrt – probier es gern nochmal. Dein Herz darf üben, „Nein“ zu sagen.";
-    } else if (blocked > 0 && missed === 0) {
-      text = `Sehr gut! Du hast ${blocked} Anfechtung(en) abgewehrt und keine ist an dein Herz gekommen. Gott freut sich nicht über deine Leistung, sondern über dein Vertrauen.`;
-    } else {
-      text =
-        `Du hast ${blocked} Anfechtung(en) bewusst abgewehrt. ` +
-        `${missed} sind trotzdem bei deinem Herzen gelandet.\n\nUnd genau dort, wo du es nicht geschafft hast, bleibt Jesus trotzdem für dich. Seine Wahrheit ist stärker als jede Lüge, die du verpasst hast.`;
-    }
-
-    resultTextEl.textContent = text;
-    badgeLabelEl.textContent = "Auswertung";
-  }
-
   function spawnEnemy() {
-    const rect = playfield.getBoundingClientRect();
-    const size = 76; // enemy size
     const centerX = 50;
     const centerY = 50;
 
+    // Startposition außen am Rand
     const side = Math.floor(Math.random() * 4); // 0 top, 1 right, 2 bottom, 3 left
     let xPerc, yPerc;
-    const margin = 10;
+    const margin = 8;
 
     if (side === 0) { // oben
       xPerc = margin + Math.random() * (100 - 2 * margin);
-      yPerc = -5;
+      yPerc = -8;
     } else if (side === 1) { // rechts
-      xPerc = 105;
+      xPerc = 108;
       yPerc = margin + Math.random() * (100 - 2 * margin);
     } else if (side === 2) { // unten
       xPerc = margin + Math.random() * (100 - 2 * margin);
-      yPerc = 105;
+      yPerc = 108;
     } else { // links
-      xPerc = -5;
+      xPerc = -8;
       yPerc = margin + Math.random() * (100 - 2 * margin);
     }
 
-    const enemyData = enemies[Math.floor(Math.random() * enemies.length)];
+    const enemyData = enemiesPool[Math.floor(Math.random() * enemiesPool.length)];
     const el = document.createElement("div");
     el.className = "enemy";
     el.innerHTML = `
@@ -476,7 +511,8 @@
       intervalId: null
     };
 
-    const steps = 35; // wie viele Schritte bis zur Mitte
+    const steps = 90;      // mehr Schritte = langsamer
+    const tickMs = 60;     // Bewegung alle 60 ms
     let currentStep = 0;
 
     function move() {
@@ -485,6 +521,7 @@
         if (el.parentNode) el.remove();
         return;
       }
+
       currentStep++;
 
       // Richtung zur Mitte
@@ -497,25 +534,29 @@
       const dist = Math.abs(enemyObj.x - centerX) + Math.abs(enemyObj.y - centerY);
 
       if (dist < 4) {
-        // am Herz angekommen
+        // Herz getroffen
         clearInterval(enemyObj.intervalId);
-        if (!enemyObj.hit) {
+        if (!enemyObj.hit && gameRunning) {
+          enemyObj.hit = true;
           missed++;
           missedCountEl.textContent = missed.toString();
           el.classList.add("missed");
+          // ganz kurz den Treffer anzeigen, dann Game Over
+          setTimeout(() => {
+            if (el.parentNode) el.remove();
+            gameOverLose();
+          }, 150);
         }
-        setTimeout(() => {
-          if (el.parentNode) el.remove();
-        }, 200);
       }
 
-      if (currentStep > steps + 10) {
+      // Sicherheitsabschaltung, falls irgendwas hängt
+      if (currentStep > steps + 20) {
         clearInterval(enemyObj.intervalId);
         if (el.parentNode) el.remove();
       }
     }
 
-    enemyObj.intervalId = setInterval(move, 40);
+    enemyObj.intervalId = setInterval(move, tickMs);
     activeEnemies.push(enemyObj);
 
     el.addEventListener("click", () => {
@@ -525,20 +566,25 @@
       blocked++;
       blockedCountEl.textContent = blocked.toString();
       el.classList.add("hit");
+
       setTimeout(() => {
         clearInterval(enemyObj.intervalId);
         if (el.parentNode) el.remove();
       }, 160);
+
+      if (blocked >= targetBlocks && gameRunning) {
+        gameOverWin();
+      }
     });
   }
 
   infoBtn.addEventListener("click", () => {
     titleEl.textContent = "Was hier eigentlich passiert:";
     descEl.textContent =
-      "Die Kreise stehen für Gedanken und Anfechtungen: Lügen, Selbsthass, Stimmen des Feindes.\n\n" +
+      "Die Kreise stehen für Gedanken und Angriffe: Lügen, Selbsthass, Stimmen des Feindes.\n\n" +
       "Wenn du sie antippst, sagst du innerlich: „Nein. Das ist nicht Gottes Wahrheit über mich.“\n\n" +
-      "Auch wenn du nicht alle erwischst: Jesus bleibt bei dir. Das Spiel soll dir nur helfen, zu merken: " +
-      "Viele der harten Gedanken sind Angriffe – nicht deine Identität.";
+      "Das Herz in der Mitte bist du. Selbst wenn eine Anfechtung trifft, gilt: Jesus geht nicht weg. " +
+      "Dieses Spiel soll dir helfen, bewusster zu sehen: Viele harte Gedanken sind Angriffe – nicht deine Identität.";
   });
 
   startBtn.addEventListener("click", () => {
