@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Die Insel der 1000 Gefahren</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        /* Retro/Pixel-Schrift und allgemeiner Look */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        .pixel-font {
+            font-family: 'Press Start 2P', cursive;
+            text-shadow: 2px 2px #000;
+        }
+        
+        body {
+            background-color: #383838; /* Dunkler Hintergrund */
+            color: #E8E8E8;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .game-screen {
+            background-color: #0F380F; /* Gameboy-Bildschirm-Grün */
+            border: 10px solid #202020;
+            border-radius: 15px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 0 10px #0F380F;
+            max-width: 95vw;
+            width: 500px;
+            min-height: 600px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .retro-button {
+            background-color: #4CAF50; /* Knopffarbe */
+            color: #0F380F;
+            padding: 10px;
+            border: 3px solid #202020;
+            border-bottom: 5px solid #202020;
+            cursor: pointer;
+            transition: all 0.05s ease;
+            box-shadow: 4px 4px #202020;
+        }
+
+        .retro-button:hover {
+            background-color: #66BB6A;
+        }
+        
+        .retro-button:active {
+            box-shadow: 0 0 0 #202020;
+            transform: translateY(4px);
+            border-bottom: 3px solid #202020;
+        }
+
+        .game-text {
+            line-height: 1.5;
+            min-height: 180px;
+            font-size: 14px;
+            text-align: justify;
+        }
+        
+        .visual-cue {
+            font-size: 4rem;
+            text-align: center;
+            margin: 10px 0;
+            height: 80px;
+        }
+
+        @media (max-width: 600px) {
+            .pixel-font {
+                font-size: 0.8rem;
+            }
+            .game-text {
+                font-size: 12px;
+            }
+            .visual-cue {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body class="pixel-font">
+
+    <div class="game-screen">
+        <h1 class="text-xl text-center mb-4 text-yellow-300">DIE INSEL DER 1000 GEFAHREN</h1>
+        
+        <div id="visualCue" class="visual-cue">🌴</div>
+
+        <div id="gameText" class="game-text">
+            Klicke auf START, um dein Abenteuer zu beginnen und die Musik einzuschalten!
+        </div>
+
+        <div id="choicesContainer" class="flex flex-col gap-3 mt-auto">
+            <button id="startButton" class="retro-button" onclick="startGame()">SPIEL STARTEN</button>
+        </div>
+
+        <div id="musicStatus" class="text-xs text-center mt-2 text-gray-400">Musik: Aus</div>
+    </div>
+
+    <script>
+        // Setze die App-ID für Firestore-Pfadgenerierung (wird nicht direkt genutzt, aber als Vorbereitung)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'insel-abenteuer-game';
+        
+        // --- Game Logic and Story State ---
+        
+        // Definiert die Spiel-Szenen (ca. 20 Entscheidungspunkte)
+        const gameStates = {
+            "S1": {
+                text: "Du erwachst am feuchten Sand eines unbekannten Strandes. Dein Schiff ist zerschellt. Vor dir liegt der unheimliche, dichte Dschungel, links eine Klippe und rechts das unendliche Meer. Was tust du?",
+                cue: "🏝️",
+                choices: [
+                    { text: "Die Klippe erklimmen", next: "S2" },
+                    { text: "Einen Pfad in den Dschungel suchen", next: "S3" },
+                    { text: "Am Strand bleiben und nach Wrackteilen suchen", next: "S4" }
+                ]
+            },
+            
+            // --- Klippen-Pfad (Start S2) ---
+            "S2": {
+                text: "Der Aufstieg ist mühsam. Nach einer Stunde erreichst du ein kleines Plateau mit einer dunklen Höhlenöffnung. Du kannst den Pfad auch weiter zur Spitze verfolgen.",
+                cue: "⛰️",
+                choices: [
+                    { text: "Die Höhle untersuchen", next: "S5" },
+                    { text: "Weiter zur Klippenspitze steigen", next: "S6" }
+                ]
+            },
+            "S5": {
+                text: "Die Höhle ist feucht und riecht nach Moder. Du hörst ein leises, flatterndes Geräusch. Du brauchst Licht.",
+                cue: "🦇",
+                choices: [
+                    { text: "Versuchen, ein schnelles Feuer zu machen", next: "S11" },
+                    { text: "Ganz leise in die Tiefe schleichen", next: "S12" }
+                ]
+            },
+            "S11": {
+                text: "Das Feuer spendet Licht, aber der Rauch zieht sofort die Aufmerksamkeit von etwas Großem, Pelzigem in der Höhle auf sich. Es kommt auf dich zu!",
+                cue: "👹",
+                choices: [
+                    { text: "Versuchen, das Wesen zu bekämpfen", next: "E1" }, // Kampf-Ende
+                    { text: "Weglaufen und zurück zum Plateau", next: "S6" }
+                ]
+            },
+            "S12": {
+                text: "Du schleichst durch die Höhle und findest einen engen Durchgang. Dahinter liegt eine Schatzkammer mit Goldmünzen und einem alten Funkgerät. Du sendest ein Notsignal!",
+                cue: "🏆",
+                choices: [
+                    { text: "SPIEL ENDE (Schatz und Rettung!)", next: "E2" } 
+                ]
+            },
+            "S6": {
+                text: "Du erreichst die Spitze der Klippe. Von hier aus hast du einen weiten Blick über die Insel. Du siehst eine Rauchfahne am Horizont.",
+                cue: "🔭",
+                choices: [
+                    { text: "Ein riesiges Signalfeuer entzünden", next: "S13" },
+                    { text: "Die Klippe auf der anderen Seite zum Fluss hinuntersteigen", next: "S14" }
+                ]
+            },
+            "S13": {
+                text: "Dein Signalfeuer wird bemerkt. Nach Stunden siehst du ein Rettungsboot, das auf dich zukommt. Du bist gerettet!",
+                cue: "🚢",
+                choices: [
+                    { text: "SPIEL ENDE (Rettung)", next: "E2" } 
+                ]
+            },
+            "S14": {
+                text: "Der Abstieg ist tückisch. Du rutschst auf nassem Moos aus und verletzt dich schwer am Bein. Du kannst dich kaum noch bewegen. Die Nacht bricht herein.",
+                cue: "🚑",
+                choices: [
+                    { text: "SPIEL ENDE (Verletzt und allein)", next: "E3" } 
+                ]
+            },
+            
+            // --- Dschungel-Pfad (Start S3) ---
+            "S3": {
+                text: "Der Dschungel ist ein Labyrinth aus Lianen und dichtem Laub. Die Sonne dringt kaum hindurch. Du hörst das Rauschen von Wasser in der Ferne.",
+                cue: "🌳",
+                choices: [
+                    { text: "Direkt in Richtung des Flussrauschens gehen", next: "S7" },
+                    { text: "Einem schwachen Trampelpfad zu einer alten Ruine folgen", next: "S8" }
+                ]
+            },
+            "S7": {
+                text: "Du erreichst den Fluss. Das Wasser ist trüb. Am Ufer liegt ein riesiger Baumstamm, der perfekt als Brücke dienen könnte. Du bemerkst aber auch eine dunkle Bewegung unter der Oberfläche.",
+                cue: "🐊",
+                choices: [
+                    { text: "Über den Baumstamm balancieren", next: "S15" },
+                    { text: "Einen anderen Weg flussaufwärts suchen", next: "S16" }
+                ]
+            },
+            "S15": {
+                text: "Das Krokodil ist schneller als du dachtest. Es taucht auf und reißt dich vom Baumstamm. Du kannst dich nicht wehren.",
+                cue: "❌",
+                choices: [
+                    { text: "SPIEL ENDE (Gefressen)", next: "E3" } 
+                ]
+            },
+            "S16": {
+                text: "Du gehst tiefer in das Dickicht. Plötzlich stehst du vor einer Wand aus hochgiftigen Schlangen, die in den Bäumen lauern. Ein Zurück ist schwierig.",
+                cue: "🐍",
+                choices: [
+                    { text: "Trotz der Schlangen versuchen, den Weg zu durchqueren", next: "S17" },
+                    { text: "Einen gefährlichen Rückweg zum Fluss antreten", next: "S7" }
+                ]
+            },
+            "S17": {
+                text: "Du schleichst vorsichtig. Die Schlangen ignorieren dich. Du findest einen kleinen Tempel in der Mitte des Dickichts. Dort liegt ein vergessener, aber vollständiger Notfallrucksack.",
+                cue: "🎒",
+                choices: [
+                    { text: "Mit dem Rucksack zum Fluss gehen", next: "S7" } // Zurück, aber besser ausgerüstet!
+                ]
+            },
+            "S8": {
+                text: "Die Ruine ist beeindruckend, von Lianen überwuchert. Du findest eine Steinplatte mit seltsamen Symbolen und einer Geheimtür, die nur mit einem Hebel geöffnet werden kann.",
+                cue: "🛕",
+                choices: [
+                    { text: "Den Hebel ziehen", next: "S18" },
+                    { text: "Die Ruine weiter nach nützlichen Gegenständen erkunden", next: "S19" }
+                ]
+            },
+            "S18": {
+                text: "Der Hebel löst eine Falle aus! Eine Steinplatte fällt von der Decke und versperrt den Ausgang. Du bist gefangen.",
+                cue: "🪦",
+                choices: [
+                    { text: "SPIEL ENDE (Gefangen)", next: "E3" } 
+                ]
+            },
+            "S19": {
+                text: "Hinter einer umgestürzten Säule findest du eine Schatzkarte! Ein großes, rotes 'X' markiert eine Stelle am anderen Ende der Insel.",
+                cue: "🗺️",
+                choices: [
+                    { text: "Sofort dem 'X' auf der Karte folgen", next: "S20" },
+                    { text: "Zurück zum Strand gehen, um Vorräte zu sammeln", next: "S4" }
+                ]
+            },
+            "S20": {
+                text: "Nach einer langen Wanderung erreichst du die markierte Stelle. Dort findest du... nichts. Nur einen weiteren, leeren Strand. Entmutigt verbringst du die Nacht.",
+                cue: "😔",
+                choices: [
+                    { text: "SPIEL ENDE (Verschwendete Zeit)", next: "E3" } 
+                ]
+            },
+
+            // --- Strand-Pfad (Start S4) ---
+            "S4": {
+                text: "Du bleibst am Strand. Die Sonne brennt. Die Ebbe legt einige flache Felsen frei. Du bist hungrig und musst die Nacht überstehen.",
+                cue: "☀️",
+                choices: [
+                    { text: "Versuchen, Fische in den Gezeitenpools zu fangen", next: "S9" },
+                    { text: "Eine provisorische Schutzhütte bauen", next: "S10" }
+                ]
+            },
+            "S9": {
+                text: "Du fängst einen großen, farbenprächtigen Fisch! Er sieht lecker aus, aber du bist unsicher, ob er giftig ist. Du hast kein Werkzeug, um ihn gut zu braten.",
+                cue: "🐠",
+                choices: [
+                    { text: "Ihn roh essen (Du bist zu hungrig!)", next: "E4" }, // Gift-Ende
+                    { text: "Ihn vergraben und nach essbaren Pflanzen suchen", next: "S3" } // In den Dschungel
+                ]
+            },
+            "S10": {
+                text: "Deine Hütte ist notdürftig. Am Abend zieht ein starker Sturm auf. Das Dach droht jeden Moment weggeweht zu werden.",
+                cue: "⛈️",
+                choices: [
+                    { text: "Das Dach mit Seilen (Lianen) verstärken", next: "S13" }, // Rettung durch Zufall (Führt zu S13)
+                    { text: "In den Dschungel fliehen, um Schutz zu suchen", next: "S3" }
+                ]
+            },
+            
+            // --- ENDEN ---
+            "E1": {
+                text: "Du kämpfst tapfer gegen das Höhlenwesen, aber es ist zu stark und schnell. Das ist das Ende deines Abenteuers.",
+                cue: "⚰️",
+                choices: [{ text: "Neues Spiel starten", next: "S1" }]
+            },
+            "E2": {
+                text: "Du hast überlebt! Du verlässt die Insel, reich an Erfahrung oder reich an Gold. Du bist ein Überlebender der 1000 Gefahren!",
+                cue: "🎉",
+                choices: [{ text: "Neues Spiel starten", next: "S1" }]
+            },
+            "E3": {
+                text: "Ein unglückliches Ende. Die Insel war dir zu feindselig gesinnt. Versuch es beim nächsten Mal mit einer anderen Entscheidung.",
+                cue: "🥀",
+                choices: [{ text: "Neues Spiel starten", next: "S1" }]
+            },
+            "E4": {
+                text: "Der Fisch war giftig! Du spürst ein Brennen im Magen und verlierst langsam das Bewusstsein.",
+                cue: "🤮",
+                choices: [{ text: "Neues Spiel starten", next: "S1" }]
+            }
+        };
+
+        let currentSceneId = "S1";
+        
+        // --- Music/Tone.js Setup ---
+        const synth = new Tone.Synth({
+            oscillator: { type: "square" },
+            envelope: {
+                attack: 0.005,
+                decay: 0.1,
+                sustain: 0.2,
+                release: 1
+            }
+        }).toDestination();
+
+        // Einfache Gameboy-Melodie (vier Töne, sich wiederholend)
+        const notes = ["C4", "E4", "G4", "C5", "G4", "E4"];
+        const sequence = new Tone.Sequence((time, note) => {
+            synth.triggerAttackRelease(note, "8n", time);
+        }, notes, "4n").start(0);
+
+        sequence.loop = true;
+        
+        let isMusicPlaying = false;
+
+        async function toggleMusic() {
+            if (!isMusicPlaying) {
+                await Tone.start();
+                Tone.Transport.start();
+                isMusicPlaying = true;
+                document.getElementById('musicStatus').textContent = "Musik: Spielt 🎶";
+            } else {
+                Tone.Transport.stop();
+                isMusicPlaying = false;
+                document.getElementById('musicStatus').textContent = "Musik: Aus";
+            }
+        }
+        
+        // --- Game Functions ---
+
+        function updateScreen(sceneId) {
+            const scene = gameStates[sceneId];
+            if (!scene) {
+                console.error("Szene nicht gefunden:", sceneId);
+                return;
+            }
+
+            currentSceneId = sceneId;
+            
+            // Text aktualisieren
+            document.getElementById('gameText').textContent = scene.text;
+            
+            // Visuelle Anzeige aktualisieren (Emojis als Pixel-Grafik-Ersatz)
+            document.getElementById('visualCue').textContent = scene.cue;
+            
+            // Entscheidungen aktualisieren
+            const container = document.getElementById('choicesContainer');
+            container.innerHTML = ''; // Vorherige Buttons entfernen
+            
+            scene.choices.forEach(choice => {
+                const button = document.createElement('button');
+                button.className = 'retro-button pixel-font text-sm';
+                button.textContent = choice.text;
+                button.onclick = () => makeChoice(choice.next);
+                container.appendChild(button);
+            });
+            
+            // Musiksteuerung nur in der Spielszene anzeigen, nicht im Startbildschirm
+            if (sceneId !== "S1") {
+                 // Füge den Neustart-Button hinzu, wenn es ein Endzustand ist
+                if (sceneId.startsWith('E')) {
+                    const restartButton = document.createElement('button');
+                    restartButton.className = 'retro-button pixel-font text-sm mt-4 bg-red-500 hover:bg-red-600';
+                    restartButton.textContent = 'NEUSTART';
+                    restartButton.onclick = () => startGame(true); // Startet das Spiel neu ohne Musik-Toggle
+                    container.appendChild(restartButton);
+                } else {
+                    // Füge den Musik-Toggle hinzu, wenn es keine Endszene ist
+                    const musicToggle = document.createElement('button');
+                    musicToggle.className = 'retro-button pixel-font text-xs mt-4 bg-gray-500 hover:bg-gray-600';
+                    musicToggle.textContent = isMusicPlaying ? 'MUSIK AUS' : 'MUSIK AN';
+                    musicToggle.onclick = toggleMusic;
+                    container.appendChild(musicToggle);
+                }
+            }
+        }
+
+        function startGame(isRestart = false) {
+            if (!isRestart) {
+                 toggleMusic(); // Starte die Musik beim ersten Klick
+            }
+            // Setze auf die erste Szene
+            updateScreen("S1");
+            // Verstecke den Start-Button, wenn das Spiel läuft
+            const startButton = document.getElementById('startButton');
+            if(startButton) {
+                startButton.style.display = 'none';
+            }
+        }
+
+        function makeChoice(nextSceneId) {
+            updateScreen(nextSceneId);
+        }
+
+        // Initialisiere den Bildschirm auf dem Start-Zustand (da die Musik erst durch Nutzerinteraktion starten darf)
+        updateScreen(currentSceneId);
+
+    </script>
+</body>
+</html>
