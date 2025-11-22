@@ -299,7 +299,8 @@
     </div>
     <div class="text" id="description">
       Tippe die Kreise an, bevor sie dein Herz erreichen. Jeder Tipp ist ein „Nein“ zur Lüge.
-      Das Spiel läuft, bis eine Anfechtung dein Herz berührt – oder du 999 Angriffe abgewehrt hast.
+      Das Spiel läuft, bis eine Anfechtung dein Herz berührt – oder du 100 Angriffe abgewehrt hast.
+      Ab 20, 50 und 70 wird es spürbar schwerer.
     </div>
 
     <div class="playfield-wrapper">
@@ -312,7 +313,7 @@
     </div>
 
     <div class="status-row">
-      <div>Abgewehrt: <strong id="blocked-count">0</strong> / 999</div>
+      <div>Abgewehrt: <strong id="blocked-count">0</strong> / 100</div>
       <div>Getroffen: <strong id="missed-count">0</strong></div>
     </div>
 
@@ -334,7 +335,7 @@
 </div>
 
 <script>
-  const targetBlocks = 999;
+  const targetBlocks = 100;
 
   const enemiesPool = [
     // Feind / Satan
@@ -380,7 +381,7 @@
   ];
 
   let gameRunning = false;
-  let spawnInterval = null;
+  let spawnTimeout = null;
   let activeEnemies = [];
   let blocked = 0;
   let missed = 0;
@@ -414,29 +415,33 @@
     resultTextEl.textContent = "";
     secondaryLabelEl.textContent = "";
     clearEnemies();
+    if (spawnTimeout) {
+      clearTimeout(spawnTimeout);
+      spawnTimeout = null;
+    }
   }
 
   function gameOverWin() {
     gameRunning = false;
-    if (spawnInterval) {
-      clearInterval(spawnInterval);
-      spawnInterval = null;
+    if (spawnTimeout) {
+      clearTimeout(spawnTimeout);
+      spawnTimeout = null;
     }
     clearEnemies();
     badgeLabelEl.textContent = "Sieg!";
     startBtn.disabled = false;
     startLabelEl.textContent = "Nochmal spielen";
     resultTextEl.textContent =
-      `Sehr stark! Du hast ${targetBlocks} Angriffe bewusst abgewehrt.\n\n` +
-      `Nicht, weil du perfekt bist, sondern weil du gelernt hast: ` +
-      `Viele Gedanken sind Angriffe – und Gottes Wahrheit ist stärker.`;
+      "Glückwunsch! Du hast 100 Angriffe abgewehrt.\n\n" +
+      "Du hast die Anfechtungen auf dein Herz erfolgreich abgeschmettert.\n" +
+      "Gott ist bei dir – nicht, weil du im Spiel gut bist, sondern weil du ihm vertraust.";
   }
 
   function gameOverLose() {
     gameRunning = false;
-    if (spawnInterval) {
-      clearInterval(spawnInterval);
-      spawnInterval = null;
+    if (spawnTimeout) {
+      clearTimeout(spawnTimeout);
+      spawnTimeout = null;
     }
     clearEnemies();
     badgeLabelEl.textContent = "Herz getroffen";
@@ -444,10 +449,27 @@
     startLabelEl.textContent = "Nochmal spielen";
 
     resultTextEl.textContent =
-      `Eine Anfechtung hat dein Herz getroffen.\n\n` +
-      `Das heißt NICHT, dass du verloren hast. Es heißt nur: Du bist Mensch.\n` +
-      `Genau dort, wo die Lüge getroffen hat, bleibt Jesus bei dir und spricht: ` +
-      `„Ich lasse dich nicht fallen.“`;
+      "Eine Anfechtung hat dein Herz getroffen.\n\n" +
+      "Das heißt NICHT, dass du verloren hast. Es heißt nur: Du bist Mensch.\n" +
+      "Genau dort, wo die Lüge trifft, bleibt Jesus bei dir und sagt:\n" +
+      "„Ich lasse dich nicht fallen.“";
+  }
+
+  function getSpawnDelay() {
+    // Stufenweise Steigerung:
+    // 0–19: langsam, 20–49: schneller, 50–69: noch schneller, 70–100: sehr dicht
+    if (blocked < 20) return 1100;
+    if (blocked < 50) return 800;
+    if (blocked < 70) return 550;
+    return 350;
+  }
+
+  function scheduleNextSpawn() {
+    if (!gameRunning) return;
+    spawnEnemy();
+    secondaryLabelEl.textContent = `Abgewehrt: ${blocked} / ${targetBlocks}`;
+    const delay = getSpawnDelay();
+    spawnTimeout = setTimeout(scheduleNextSpawn, delay);
   }
 
   function startGame() {
@@ -457,15 +479,31 @@
     startLabelEl.textContent = "Läuft...";
     badgeLabelEl.textContent = "Spiel läuft";
     descEl.textContent =
-      "Tippe die Angriffe an, bevor sie dein Herz erreichen. Sobald ein Angriff das Herz berührt, ist die Runde vorbei. Wenn du 999 Angriffe abwehrst, hast du gewonnen.";
+      "Tippe die Angriffe an, bevor sie dein Herz erreichen. Ab 20, 50 und 70 wird es immer dichter und chaotischer.\n" +
+      "Sobald eine Anfechtung dein Herz berührt, ist die Runde vorbei. Wenn du 100 schaffst, hast du gewonnen.";
 
-    const spawnDelay = 900; // neue Gegner etwa alle 0,9 s
+    scheduleNextSpawn();
+  }
 
-    spawnInterval = setInterval(() => {
-      if (!gameRunning) return;
-      spawnEnemy();
-      secondaryLabelEl.textContent = `Abgewehrt: ${blocked} / ${targetBlocks}`;
-    }, spawnDelay);
+  function choosePattern() {
+    // Je mehr abgewehrt, desto mehr Zickzack/Welle
+    const d = blocked;
+    const r = Math.random();
+    if (d < 20) {
+      return "straight";
+    } else if (d < 50) {
+      if (r < 0.6) return "straight";
+      if (r < 0.85) return "zigzag";
+      return "wave";
+    } else if (d < 70) {
+      if (r < 0.4) return "straight";
+      if (r < 0.75) return "zigzag";
+      return "wave";
+    } else {
+      if (r < 0.25) return "straight";
+      if (r < 0.6) return "zigzag";
+      return "wave";
+    }
   }
 
   function spawnEnemy() {
@@ -474,21 +512,21 @@
 
     // Startposition außen am Rand
     const side = Math.floor(Math.random() * 4); // 0 top, 1 right, 2 bottom, 3 left
-    let xPerc, yPerc;
+    let startX, startY;
     const margin = 8;
 
     if (side === 0) { // oben
-      xPerc = margin + Math.random() * (100 - 2 * margin);
-      yPerc = -8;
+      startX = margin + Math.random() * (100 - 2 * margin);
+      startY = -8;
     } else if (side === 1) { // rechts
-      xPerc = 108;
-      yPerc = margin + Math.random() * (100 - 2 * margin);
+      startX = 108;
+      startY = margin + Math.random() * (100 - 2 * margin);
     } else if (side === 2) { // unten
-      xPerc = margin + Math.random() * (100 - 2 * margin);
-      yPerc = 108;
+      startX = margin + Math.random() * (100 - 2 * margin);
+      startY = 108;
     } else { // links
-      xPerc = -8;
-      yPerc = margin + Math.random() * (100 - 2 * margin);
+      startX = -8;
+      startY = margin + Math.random() * (100 - 2 * margin);
     }
 
     const enemyData = enemiesPool[Math.floor(Math.random() * enemiesPool.length)];
@@ -500,14 +538,26 @@
     `;
     playfield.appendChild(el);
 
-    el.style.left = xPerc + "%";
-    el.style.top = yPerc + "%";
+    const vx = centerX - startX;
+    const vy = centerY - startY;
+    const len = Math.sqrt(vx * vx + vy * vy) || 1;
+    const px = -vy / len; // senkrecht zur Flugrichtung
+    const py = vx / len;
 
+    el.style.left = startX + "%";
+    el.style.top = startY + "%";
+
+    const pattern = choosePattern();
     const enemyObj = {
       el,
-      x: xPerc,
-      y: yPerc,
+      startX,
+      startY,
+      x: startX,
+      y: startY,
       hit: false,
+      pattern,
+      perpX: px,
+      perpY: py,
       intervalId: null
     };
 
@@ -523,34 +573,45 @@
       }
 
       currentStep++;
+      let t = currentStep / steps;
+      if (t > 1) t = 1;
 
-      // Richtung zur Mitte
-      enemyObj.x += (centerX - enemyObj.x) / (steps - currentStep + 1);
-      enemyObj.y += (centerY - enemyObj.y) / (steps - currentStep + 1);
+      // seitliche Bewegung je nach Pattern
+      let amplitude = 0;
+      if (enemyObj.pattern === "zigzag") {
+        const phase = Math.floor(currentStep / 6) % 2;
+        amplitude = (phase === 0 ? 10 : -10);
+      } else if (enemyObj.pattern === "wave") {
+        amplitude = 12 * Math.sin(currentStep / 7);
+      }
+
+      enemyObj.x = enemyObj.startX + (centerX - enemyObj.startX) * t + enemyObj.perpX * amplitude;
+      enemyObj.y = enemyObj.startY + (centerY - enemyObj.startY) * t + enemyObj.perpY * amplitude;
 
       el.style.left = enemyObj.x + "%";
       el.style.top = enemyObj.y + "%";
 
-      const dist = Math.abs(enemyObj.x - centerX) + Math.abs(enemyObj.y - centerY);
+      const dx = enemyObj.x - centerX;
+      const dy = enemyObj.y - centerY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
 
-      if (dist < 4) {
-        // Herz getroffen
+      // HARTE CUT-SCHRANKE: etwas größerer Radius, damit nichts "durchrutscht"
+      if (dist < 8) {
         clearInterval(enemyObj.intervalId);
         if (!enemyObj.hit && gameRunning) {
           enemyObj.hit = true;
           missed++;
           missedCountEl.textContent = missed.toString();
           el.classList.add("missed");
-          // ganz kurz den Treffer anzeigen, dann Game Over
           setTimeout(() => {
             if (el.parentNode) el.remove();
             gameOverLose();
-          }, 150);
+          }, 120);
         }
       }
 
-      // Sicherheitsabschaltung, falls irgendwas hängt
-      if (currentStep > steps + 20) {
+      // Sicherheitsabschaltung
+      if (currentStep > steps + 30) {
         clearInterval(enemyObj.intervalId);
         if (el.parentNode) el.remove();
       }
@@ -583,8 +644,8 @@
     descEl.textContent =
       "Die Kreise stehen für Gedanken und Angriffe: Lügen, Selbsthass, Stimmen des Feindes.\n\n" +
       "Wenn du sie antippst, sagst du innerlich: „Nein. Das ist nicht Gottes Wahrheit über mich.“\n\n" +
-      "Das Herz in der Mitte bist du. Selbst wenn eine Anfechtung trifft, gilt: Jesus geht nicht weg. " +
-      "Dieses Spiel soll dir helfen, bewusster zu sehen: Viele harte Gedanken sind Angriffe – nicht deine Identität.";
+      "Je mehr du abwehrst, desto dichter und chaotischer wird es – so wie im echten Leben. " +
+      "Und trotzdem gilt: Deine Identität hängt nicht davon ab, wie gut du klickst, sondern daran, was Jesus über dich sagt.";
   });
 
   startBtn.addEventListener("click", () => {
