@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>NEW YORK CITY QUEST – Intro</title>
+  <title>NEW YORK CITY QUEST</title>
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 
@@ -10,12 +10,13 @@
     :root {
       --bg: #020617;
       --bg2: #0b1120;
-      --card: #020617;
-      --accent1: #22c55e;  /* grün */
-      --accent2: #fb923c;  /* orange */
-      --accent3: #38bdf8;  /* blau */
+      --panel: #020617;
+      --accent1: #22c55e;
+      --accent2: #fb923c;
+      --accent3: #38bdf8;
       --txt-main: #e5e7eb;
       --txt-muted: #9ca3af;
+      --border: #111827;
     }
 
     * {
@@ -41,125 +42,75 @@
       overscroll-behavior: none;
     }
 
-    .app {
+    .game {
       width: 100%;
-      max-width: 520px;
+      max-width: 560px;
       margin: 0 auto;
-      padding: 12px 10px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 10px;
-      height: 100vh;
-    }
-
-    .title-bar {
-      text-align: center;
-      font-size: 12px;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--txt-muted);
-    }
-
-    .card {
-      flex: 1;
-      background:
-        linear-gradient(145deg, rgba(15,23,42,0.95), rgba(2,6,23,0.98));
-      border-radius: 18px;
-      border: 1px solid #111827;
-      box-shadow:
-        0 18px 40px rgba(0,0,0,0.8),
-        inset 0 0 0 1px rgba(148,163,184,0.1);
-      padding: 12px 12px 10px;
+      padding: 10px;
       display: flex;
       flex-direction: column;
       gap: 8px;
-      position: relative;
-      overflow: hidden;
+      min-height: 100vh;
     }
 
-    /* Pixel-Rand / Rahmen */
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: 6px;
-      border-radius: 10px;
-      border: 2px solid rgba(56,189,248,0.18);
-      box-shadow:
-        0 0 0 1px rgba(15,23,42,0.8),
-        0 0 16px rgba(56,189,248,0.12);
-      pointer-events: none;
-    }
-
-    .card-inner {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      height: 100%;
-    }
-
-    .headline {
+    .game-header {
       text-align: center;
-    }
-
-    .game-title {
-      font-family: "Courier New", monospace;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      font-size: 18px;
-      margin-bottom: 2px;
-      text-shadow:
-        0 0 2px #000,
-        0 0 6px #000,
-        2px 2px 0 #000;
-    }
-
-    .game-sub {
-      font-family: "Courier New", monospace;
       font-size: 11px;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
-      letter-spacing: 0.14em;
       color: var(--txt-muted);
     }
 
-    .pixel-stage {
+    .scene-container {
       flex: 1;
+      background: radial-gradient(circle at top, #020617 0, #000 100%);
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      box-shadow:
+        0 18px 40px rgba(0,0,0,0.8),
+        inset 0 0 0 1px rgba(148,163,184,0.12);
+      padding: 10px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 4px 2px 0;
+      gap: 8px;
     }
 
-    /* Pixel-Skyline */
-    .skyline {
-      width: 100%;
-      max-width: 340px;
-      margin: 0 auto;
-      height: 120px;
+    .scene-bg {
+      height: 38vh;
+      min-height: 160px;
+      border-radius: 12px;
+      border: 1px solid #020617;
+      box-shadow:
+        inset 0 0 16px rgba(0,0,0,0.9),
+        0 0 0 1px rgba(15,23,42,0.7);
       position: relative;
+      overflow: hidden;
       image-rendering: pixelated;
     }
 
-    .sky-layer {
+    .scene-bg::after {
+      content: "";
       position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      inset: 0;
+      background-image: linear-gradient(
+        rgba(0,0,0,0.3) 1px,
+        transparent 1px
+      );
+      background-size: 100% 3px;
+      pointer-events: none;
+      opacity: 0.45;
     }
 
-    .sky-grad {
-      top: 0;
-      height: 100%;
+    /* Start: New York Skyline */
+
+    .bg-menu {
       background:
-        radial-gradient(circle at top, #38bdf8 0, #1e293b 40%, #020617 100%);
-      opacity: 0.65;
+        radial-gradient(circle at top, #38bdf8 0, #0f172a 40%, #020617 100%);
     }
-
-    .buildings-back {
-      height: 50px;
+    .bg-menu .layer-1 {
+      position: absolute;
+      inset: auto 0 40px;
+      height: 34px;
       background:
         repeating-linear-gradient(
           to right,
@@ -168,11 +119,11 @@
           #0b1120 6px,
           #0b1120 12px
         );
-      opacity: 0.9;
     }
-
-    .buildings-mid {
-      height: 75px;
+    .bg-menu .layer-2 {
+      position: absolute;
+      inset: auto 0 18px;
+      height: 58px;
       background:
         repeating-linear-gradient(
           to right,
@@ -182,120 +133,452 @@
           #111827 20px
         );
       clip-path: polygon(
-        0 40%, 8% 5%, 16% 40%, 23% 10%, 30% 50%,
-        40% 15%, 50% 55%, 60% 8%, 70% 45%, 80% 15%,
-        88% 45%, 100% 20%, 100% 100%, 0 100%
+        0 50%, 6% 5%, 13% 50%, 24% 10%,
+        35% 55%, 47% 8%, 55% 60%, 68% 15%,
+        80% 52%, 90% 12%, 100% 50%, 100% 100%, 0 100%
       );
     }
+    .bg-menu .layer-3 {
+      position: absolute;
+      inset: auto 0 0;
+      height: 26px;
+      background:
+        repeating-linear-gradient(
+          to right,
+          #020617,
+          #020617 14px,
+          #0f172a 14px,
+          #0f172a 28px
+        );
+    }
 
-    .buildings-front {
-      height: 38px;
+    /* Park */
+
+    .bg-park {
+      background:
+        linear-gradient(to top, #022c22 0, #064e3b 40%, #0f172a 75%, #020617 100%);
+    }
+    .bg-park .ground {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 50px;
+      background:
+        repeating-linear-gradient(
+          to right,
+          #022c22,
+          #022c22 10px,
+          #065f46 10px,
+          #065f46 20px
+        );
+    }
+    .bg-park .bench {
+      position: absolute;
+      bottom: 26px;
+      left: 50%;
+      width: 120px;
+      height: 18px;
+      transform: translateX(-50%);
+      background:
+        repeating-linear-gradient(
+          to right,
+          #111827,
+          #111827 8px,
+          #020617 8px,
+          #020617 16px
+        );
+      box-shadow: 0 4px 0 #020617;
+    }
+    .bg-park .bench::after {
+      content: "";
+      position: absolute;
+      inset: auto 20px -8px 20px;
+      height: 8px;
+      background: #020617;
+      box-shadow: -50px 0 0 #020617, 50px 0 0 #020617;
+    }
+    .bg-park .tree {
+      position: absolute;
+      bottom: 35px;
+      left: 20px;
+      width: 26px;
+      height: 40px;
+      background: #14532d;
+      border-radius: 50% 50% 10% 10%;
+      box-shadow: 55px 4px 0 #166534, 200px 2px 0 #14532d;
+    }
+
+    /* Fast Food */
+
+    .bg-fastfood {
+      background:
+        linear-gradient(to top, #7f1d1d 0, #b91c1c 40%, #0f172a 75%, #020617 100%);
+    }
+    .bg-fastfood .front {
+      position: absolute;
+      bottom: 0;
+      left: 10%;
+      right: 10%;
+      height: 80px;
+      background:
+        repeating-linear-gradient(
+          to right,
+          #111827,
+          #111827 12px,
+          #020617 12px,
+          #020617 24px
+        );
+    }
+    .bg-fastfood .band {
+      position: absolute;
+      bottom: 56px;
+      left: 14%;
+      right: 14%;
+      height: 10px;
+      background:
+        repeating-linear-gradient(
+          to right,
+          #fecaca,
+          #fecaca 6px,
+          #fee2e2 6px,
+          #fee2e2 12px
+        );
+    }
+    .bg-fastfood .sign {
+      position: absolute;
+      bottom: 76px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 14px;
+      background: #f97316;
+      box-shadow: 0 0 10px rgba(248,113,113,0.85);
+    }
+
+    /* Library */
+
+    .bg-library {
+      background:
+        linear-gradient(to top, #1f2937 0, #111827 50%, #020617 100%);
+    }
+    .bg-library .steps {
+      position: absolute;
+      bottom: 0;
+      left: 8%;
+      right: 8%;
+      height: 40px;
+      background:
+        repeating-linear-gradient(
+          to top,
+          #020617,
+          #020617 8px,
+          #111827 8px,
+          #111827 16px
+        );
+    }
+    .bg-library .columns {
+      position: absolute;
+      bottom: 40px;
+      left: 12%;
+      right: 12%;
+      height: 60px;
       background:
         repeating-linear-gradient(
           to right,
           #020617,
           #020617 12px,
-          #0f172a 12px,
-          #0f172a 24px
+          #4b5563 12px,
+          #4b5563 18px
+        );
+    }
+    .bg-library .sign {
+      position: absolute;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 12px;
+      background: #9ca3af;
+    }
+
+    /* Street */
+
+    .bg-street {
+      background:
+        linear-gradient(to top, #020617 0, #111827 45%, #0b1120 100%);
+    }
+    .bg-street .road {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background:
+        repeating-linear-gradient(
+          to right,
+          #020617,
+          #020617 14px,
+          #030712 14px,
+          #030712 28px
+        );
+    }
+    .bg-street .road::before {
+      content: "";
+      position: absolute;
+      top: 16px;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background:
+        repeating-linear-gradient(
+          to right,
+          #facc15,
+          #facc15 10px,
+          transparent 10px,
+          transparent 20px
+        );
+    }
+    .bg-street .blocks {
+      position: absolute;
+      bottom: 40px;
+      left: 8%;
+      right: 8%;
+      height: 70px;
+      background:
+        repeating-linear-gradient(
+          to right,
+          #020617,
+          #020617 12px,
+          #111827 12px,
+          #111827 24px
         );
     }
 
-    .windows {
+    /* Hotel */
+
+    .bg-hotel {
+      background:
+        linear-gradient(to top, #020617 0, #0f172a 40%, #020617 100%);
+    }
+    .bg-hotel .facade {
       position: absolute;
-      inset: auto 0 10px;
+      bottom: 0;
+      left: 10%;
+      right: 10%;
+      height: 90px;
+      background:
+        repeating-linear-gradient(
+          to right,
+          #020617,
+          #020617 10px,
+          #111827 10px,
+          #111827 20px
+        );
+    }
+    .bg-hotel .door {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 48px;
+      height: 42px;
+      background: #020617;
+      border: 2px solid #374151;
+    }
+    .bg-hotel .logo {
+      position: absolute;
+      bottom: 82px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 130px;
+      height: 14px;
+      background: #f97316;
+      box-shadow: 0 0 12px rgba(248,113,113,0.9);
+    }
+
+    /* Boiler */
+
+    .bg-boiler {
+      background:
+        radial-gradient(circle at top, #0f172a 0, #020617 60%, #000000 100%);
+    }
+    .bg-boiler .pipes {
+      position: absolute;
+      bottom: 60px;
+      left: 0;
+      right: 0;
+      height: 30px;
+      background:
+        repeating-linear-gradient(
+          to right,
+          #111827,
+          #111827 16px,
+          #020617 16px,
+          #020617 30px
+        );
+    }
+    .bg-boiler .boiler {
+      position: absolute;
+      bottom: 26px;
+      left: 20%;
+      width: 90px;
+      height: 60px;
+      background: #020617;
+      border: 2px solid #4b5563;
+      box-shadow: 0 0 10px rgba(148,163,184,0.7);
+    }
+    .bg-boiler .mattress {
+      position: absolute;
+      bottom: 8px;
+      right: 12%;
+      width: 100px;
+      height: 20px;
+      background:
+        repeating-linear-gradient(
+          to right,
+          #e5e7eb,
+          #e5e7eb 10px,
+          #cbd5f5 10px,
+          #cbd5f5 20px
+        );
+      box-shadow: 0 3px 0 #020617;
+    }
+
+    /* Corridor */
+
+    .bg-corridor {
+      background:
+        linear-gradient(to top, #111827 0, #020617 65%, #000 100%);
+    }
+    .bg-corridor .floor {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
       height: 40px;
+      background:
+        repeating-linear-gradient(
+          to right,
+          #020617,
+          #020617 14px,
+          #030712 14px,
+          #030712 28px
+        );
+    }
+    .bg-corridor .door {
+      position: absolute;
+      bottom: 40px;
+      width: 40px;
+      height: 60px;
+      background: #020617;
+      border: 2px solid #374151;
+      box-shadow: 0 0 6px rgba(148,163,184,0.4);
+    }
+    .bg-corridor .door.d1 { left: 15%; }
+    .bg-corridor .door.d2 { left: 45%; }
+    .bg-corridor .door.d3 { left: 75%; }
+
+    .scene-panel {
+      flex: 1;
       display: flex;
-      justify-content: center;
-      gap: 2px;
-      pointer-events: none;
-    }
-
-    .window-row {
-      height: 100%;
-      display: flex;
-      gap: 2px;
-      align-items: flex-end;
-    }
-
-    .win {
-      width: 3px;
-      height: 4px;
-      background: var(--accent2);
-      box-shadow:
-        0 0 4px rgba(251,146,60,0.8);
-    }
-
-    .win.blue {
-      background: var(--accent3);
-      box-shadow:
-        0 0 4px rgba(56,189,248,0.9);
-    }
-
-    .win.green {
-      background: var(--accent1);
-      box-shadow:
-        0 0 4px rgba(34,197,94,0.9);
-    }
-
-    .intro-text {
-      font-family: "Courier New", monospace;
-      font-size: 12px;
-      text-align: center;
-      white-space: pre-wrap;
-      line-height: 1.4;
-      color: var(--txt-main);
-      padding: 0 4px;
-    }
-
-    .press-start {
+      flex-direction: column;
+      gap: 6px;
       margin-top: 4px;
-      font-family: "Courier New", monospace;
-      font-size: 12px;
+    }
+
+    .scene-header {
       text-align: center;
-      letter-spacing: 0.18em;
+    }
+
+    .scene-title {
+      font-family: "Courier New", monospace;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: var(--accent1);
-      text-shadow: 0 0 5px #000;
-      animation: blink 0.85s step-end infinite;
+      font-size: 14px;
     }
 
-    @keyframes blink {
-      50% { opacity: 0; }
-    }
-
-    .status-line {
-      margin-top: 4px;
+    .scene-location {
       font-size: 11px;
-      text-align: center;
       color: var(--txt-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
     }
 
-    .bottom-row {
+    .scene-text {
+      margin-top: 6px;
+      font-family: "Courier New", monospace;
+      font-size: 12px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      max-height: 160px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .choices {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .choice-btn {
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      background: rgba(15,23,42,0.95);
+      padding: 7px 10px;
+      font-size: 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 11px;
-      color: var(--txt-muted);
-      padding: 0 4px;
+      cursor: pointer;
+      color: var(--txt-main);
     }
 
-    .chip {
-      font-family: "Courier New", monospace;
+    .choice-btn span.label {
+      flex: 1;
+      text-align: left;
+      font-size: 12px;
+    }
+
+    .choice-btn span.icon {
+      margin-left: 8px;
+      font-size: 13px;
+      opacity: 0.8;
+    }
+
+    .choice-btn:active {
+      background: #111827;
+      box-shadow: none;
+    }
+
+    .scene-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
+      color: var(--txt-muted);
+      margin-top: 6px;
+    }
+
+    .pill {
       border-radius: 999px;
       border: 1px solid #1f2937;
-      padding: 3px 10px;
+      padding: 3px 8px;
+      font-family: "Courier New", monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 9px;
       background: rgba(15,23,42,0.9);
     }
 
     .sound-indicator {
-      font-family: "Courier New", monospace;
-      font-size: 10px;
       display: inline-flex;
       gap: 4px;
       align-items: center;
+      font-family: "Courier New", monospace;
+      font-size: 10px;
     }
 
     .dot {
@@ -303,123 +586,103 @@
       height: 8px;
       border-radius: 999px;
       background: #ef4444;
-      box-shadow: 0 0 6px rgba(239,68,68,0.8);
+      box-shadow: 0 0 6px rgba(239,68,68,0.9);
     }
 
     .dot.on {
       background: #22c55e;
-      box-shadow: 0 0 6px rgba(34,197,94,0.8);
+      box-shadow: 0 0 6px rgba(34,197,94,0.9);
     }
 
-    .footer {
+    .game-footer {
       text-align: center;
       font-size: 10px;
       color: var(--txt-muted);
+      padding-bottom: 2px;
     }
 
     button {
-      font-size: 16px; /* vermeidet Zoom auf iOS beim Tippen */
+      font-size: 16px; /* gegen iOS-Zoom beim Tippen */
     }
   </style>
 </head>
 <body>
-<div class="app" id="tap-area">
-  <div class="title-bar">PIXEL · STORY · NEW YORK</div>
+<div class="game" id="root">
+  <div class="game-header">NEW YORK CITY QUEST · HTML-ADVENTURE</div>
 
-  <div class="card">
-    <div class="card-inner">
-      <div class="headline">
-        <div class="game-title">NEW YORK CITY QUEST</div>
-        <div class="game-sub">interaktives 90er-pixel-abenteuer</div>
+  <div class="scene-container">
+    <div class="scene-bg bg-menu" id="scene-bg">
+      <div class="layer-1"></div>
+      <div class="layer-2"></div>
+      <div class="layer-3"></div>
+    </div>
+
+    <div class="scene-panel">
+      <div class="scene-header">
+        <div class="scene-title" id="scene-title">NEW YORK CITY QUEST</div>
+        <div class="scene-location" id="scene-location">Hauptmenü</div>
       </div>
 
-      <div class="pixel-stage">
-        <div class="skyline">
-          <div class="sky-layer sky-grad"></div>
-          <div class="sky-layer buildings-back"></div>
-          <div class="sky-layer buildings-mid"></div>
-          <div class="sky-layer buildings-front"></div>
+      <div class="scene-text" id="scene-text">
+Willkommen bei NEW YORK CITY QUEST.
 
-          <!-- ein paar leuchtende Fenster -->
-          <div class="windows">
-            <div class="window-row">
-              <div class="win"></div>
-              <div class="win blue"></div>
-              <div class="win"></div>
-              <div class="win green"></div>
-              <div class="win"></div>
-              <div class="win blue"></div>
-            </div>
-          </div>
-        </div>
+Ein 90er-Jahre-Pixel-Abenteuer in New York.
 
-        <div class="intro-text" id="intro-text">
-Du sitzt auf einer Bank im Central Park.
-Die Stadt rauscht, irgendwo hupt ein Taxi.
+Du wachst im Central Park auf, dein Handy ist leer
+und dein bester Freund steckt im Hotel Savoy fest.
 
-Heute beginnt dein persönliches New-York-Quest.
-Tippe einmal auf den Bildschirm,
-um den 8-Bit-Sound zu aktivieren
-und das Intro zu starten.
-        </div>
-
-        <div>
-          <div class="press-start" id="press-start">▶ PRESS START</div>
-          <div class="status-line" id="status-line">
-1. Tippe einmal, um Sound zu aktivieren · 2. Tippe noch mal, um weiterzugehen
-          </div>
-        </div>
+• „Spiel starten“ beginnt die Geschichte.
+• „Musik an/aus“ schaltet die 8-Bit-Musik.
       </div>
 
-      <div class="bottom-row">
-        <div class="chip">chapter 0 · intro</div>
+      <div class="choices" id="choices"></div>
+
+      <div class="scene-footer">
+        <div class="pill" id="chapter-pill">CHAPTER · MENU</div>
         <div class="sound-indicator">
           <div class="dot" id="sound-dot"></div>
-          <span id="sound-label">Sound: AUS</span>
+          <span id="sound-label">Musik: AUS</span>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="footer">
-    Nächster Schritt: Kapitel 1 – Central Park als eigene Datei (nyc-quest-1.html)
+  <div class="game-footer">
+    Tipp: Seite als App auf den Homescreen legen.
   </div>
 </div>
 
 <script>
+  // -------- Musik (8-Bit) --------
   let audioCtx = null;
-  let isMusicOn = false;
-  let loopInterval = null;
-  let introPhase = 0; // 0 = noch nichts, 1 = Sound läuft, 2 = später: weiterleiten
+  let musicOn = false;
+  let musicInterval = null;
 
   const soundDot = document.getElementById("sound-dot");
   const soundLabel = document.getElementById("sound-label");
-  const statusLine = document.getElementById("status-line");
-  const introTextEl = document.getElementById("intro-text");
-  const pressStartEl = document.getElementById("press-start");
-  const tapArea = document.getElementById("tap-area");
 
-  function start8BitLoop() {
-    if (isMusicOn) return;
-
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) {
-      statusLine.textContent = "Dein Browser unterstützt leider keinen Web-Audio-Sound.";
+  function initAudio() {
+    if (audioCtx) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) {
+      soundLabel.textContent = "Musik: nicht unterstützt";
       return;
     }
+    audioCtx = new AC();
+  }
 
-    audioCtx = new AudioContext();
-    isMusicOn = true;
-
+  function startMusic() {
+    if (!audioCtx || musicOn) return;
+    musicOn = true;
     soundDot.classList.add("on");
-    soundLabel.textContent = "Sound: AN";
+    soundLabel.textContent = "Musik: AN";
 
-    // Einfaches 8-Bit-Motiv: C–E–G–C
-    const notes = [261.63, 329.63, 392.00, 523.25];
+    const notes = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63]; // kleines Motiv
     let step = 0;
+    if (musicInterval) clearInterval(musicInterval);
 
-    loopInterval = setInterval(() => {
-      if (!audioCtx) return;
+    musicInterval = setInterval(() => {
+      if (!musicOn || !audioCtx) return;
       const now = audioCtx.currentTime;
 
       const osc = audioCtx.createOscillator();
@@ -429,69 +692,768 @@ und das Intro zu starten.
       osc.frequency.value = notes[step % notes.length];
 
       gain.gain.setValueAtTime(0.18, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.23);
 
       osc.connect(gain);
       gain.connect(audioCtx.destination);
 
       osc.start(now);
-      osc.stop(now + 0.25);
+      osc.stop(now + 0.24);
 
       step++;
     }, 260);
   }
 
-  function stop8BitLoop() {
-    if (loopInterval) clearInterval(loopInterval);
-    loopInterval = null;
-    isMusicOn = false;
+  function stopMusic() {
+    musicOn = false;
     soundDot.classList.remove("on");
-    soundLabel.textContent = "Sound: AUS";
+    soundLabel.textContent = "Musik: AUS";
+    if (musicInterval) clearInterval(musicInterval);
+    musicInterval = null;
   }
 
-  function handleTap() {
-    if (introPhase === 0) {
-      // Erster Tap: Sound an + Text ändern
-      start8BitLoop();
-      introPhase = 1;
-      introTextEl.textContent =
-"Kapitel 1 – Central Park\n\n" +
-"Dies ist nur das Intro. Im nächsten Schritt bauen wir\n" +
-"eine eigene Datei (nyc-quest-1.html), in der du\n" +
-"durch New York läufst, Entscheidungen triffst\n" +
-"und deinen Freund im Diner triffst.\n\n" +
-"Tippe noch einmal, um symbolisch ins nächste Kapitel\n" +
-"zu springen.";
-      statusLine.textContent = "Sound läuft. Tippe noch einmal, um weiterzugehen.";
-      pressStartEl.textContent = "▶ TAP FÜR KAPITEL 1";
-    } else if (introPhase === 1) {
-      // Zweiter Tap: hier später Weiterleitung
-      introPhase = 2;
-      statusLine.textContent = "Hier verlinken wir später auf: nyc-quest-1.html";
-      introTextEl.textContent =
-"Stell dir vor, jetzt öffnet sich Kapitel 1:\n" +
-"Du in New York. Park, Subway, Diner, Boiler-Raum.\n\n" +
-"Beim nächsten Bauen erstellen wir die Datei:\n" +
-"nyc-quest-1.html\n" +
-"und lassen dich dort richtig loslaufen.";
-      pressStartEl.textContent = "COMING SOON · KAPITEL 1";
+  function toggleMusic() {
+    if (!audioCtx) {
+      initAudio();
+      if (!audioCtx) return;
+      audioCtx.resume && audioCtx.resume();
+      startMusic();
+      return;
+    }
+    if (musicOn) {
+      stopMusic();
     } else {
-      // weitere Taps: optional Sound an/aus
-      if (isMusicOn) {
-        stop8BitLoop();
-        statusLine.textContent = "Sound gestoppt. Tippe, um ihn wieder zu starten.";
-      } else {
-        start8BitLoop();
-        statusLine.textContent = "Sound wieder an.";
-      }
+      audioCtx.resume && audioCtx.resume();
+      startMusic();
     }
   }
 
-  tapArea.addEventListener("click", handleTap);
-  tapArea.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    handleTap();
-  }, { passive: false });
+  // -------- Szenen --------
+  const sceneBg = document.getElementById("scene-bg");
+  const sceneTitleEl = document.getElementById("scene-title");
+  const sceneLocationEl = document.getElementById("scene-location");
+  const sceneTextEl = document.getElementById("scene-text");
+  const choicesEl = document.getElementById("choices");
+  const chapterPill = document.getElementById("chapter-pill");
+
+  let currentSceneId = "menu";
+
+  const scenes = {
+    menu: {
+      id: "menu",
+      title: "NEW YORK CITY QUEST",
+      location: "Hauptmenü",
+      chapter: "MENU",
+      bg: "menu",
+      text:
+`Willkommen bei NEW YORK CITY QUEST.
+
+Ein 90er-Jahre-Pixel-Abenteuer in New York.
+
+Du wachst im Central Park auf, dein Handy ist leer
+und dein bester Freund steckt im Hotel Savoy fest.
+
+• „Spiel starten“ beginnt die Geschichte.
+• „Musik an/aus“ schaltet die 8-Bit-Musik.`,
+      choices: [
+        { label: "🎮 Spiel starten", action: "startGame" },
+        { label: "🎵 Musik an/aus", action: "toggleMusicOnly" }
+      ]
+    },
+
+    // PARK
+    park: {
+      id: "park",
+      title: "Aufwachen im Park",
+      location: "Central Park",
+      chapter: "CHAPTER 1",
+      bg: "park",
+      text:
+`Du wachst auf einer Parkbank im Central Park auf.
+Dein Kopf hämmert, deine Erinnerung ist Nebel.
+
+Du tastest deine Hosentasche – dein Smartphone.
+Aber: Akku 0%.
+
+Du brauchst Strom.
+
+Vor dir ein Wegweiser:
+„Staatsbibliothek – 700 m“.
+
+Gegenüber ein grell beleuchtetes Schnellrestaurant.`,
+      choices: [
+        { label: "👥 Kurz einen Passanten fragen (Hinweis)", next: "park_hint" },
+        { label: "📚 Zur Staatsbibliothek gehen", next: "library_fail" },
+        { label: "🍔 Ins Schnellrestaurant gehen", next: "fastfood" }
+      ]
+    },
+
+    park_hint: {
+      id: "park_hint",
+      title: "Warnung",
+      location: "Central Park",
+      chapter: "CHAPTER 1",
+      bg: "park",
+      text:
+`Du sprichst einen alten Mann an, der Saxophon spielt.
+
+Er schmunzelt:
+„Bibliothek? Pass auf dich auf.
+Vor großen Treppen stehen oft Leute, die mehr wollen
+als nur 'helfen'.“
+
+Er deutet mit dem Sax in Richtung Stadt:
+„Wenn dein Handy leer ist, such dir lieber einen Laden.“`,
+      choices: [
+        { label: "📚 Trotzdem zur Staatsbibliothek", next: "library_fail" },
+        { label: "🍔 Auf ihn hören und ins Schnellrestaurant", next: "fastfood" }
+      ]
+    },
+
+    library_fail: {
+      id: "library_fail",
+      title: "Scam an der Bibliothek",
+      location: "Staatsbibliothek",
+      chapter: "GAME OVER",
+      bg: "library",
+      text:
+`Du läufst die breite Treppe der Staatsbibliothek hinauf.
+
+Vor dem Eingang stehen drei Leute mit Klemmbrettern.
+„Hey, wir haben hier eine Steckdose für dich,
+kannst dein Handy kostenlos laden …“
+
+Ehe du reagierst, hat einer dein Smartphone in der Hand.
+„Wir müssen nur kurz was einstellen …“
+
+Zwei Minuten später sind sie weg.
+Kein Handy, kein Akku, kein Freund.
+
+Dein New-York-Quest endet hier –
+im Scam vor der Bibliothek.`,
+      choices: [
+        { label: "🔄 Zurück zur Parkbank – neuer Versuch", next: "park" },
+        { label: "🏠 Zurück ins Hauptmenü", next: "menu" }
+      ]
+    },
+
+    // FASTFOOD
+    fastfood: {
+      id: "fastfood",
+      title: "Neon & Fritteusenduft",
+      location: "Schnellrestaurant",
+      chapter: "CHAPTER 2",
+      bg: "fastfood",
+      text:
+`Du trittst ins Schnellrestaurant.
+Neonlicht. Fettgeruch. Stimmen.
+
+An der Wand findest du eine Steckdose.
+Du steckst dein Handy ein – der Akku füllt sich langsam.
+
+Auf dem Nachbartisch steht ein halb gegessener Burger,
+Pommes, Cola.
+
+Dein Magen knurrt laut.`,
+      choices: [
+        { label: "🍟 Den Burger & die Pommes essen", next: "fastfood_eat" },
+        { label: "🙅‍♂️ Nur warten, nichts anfassen", next: "fastfood_wait" },
+        { label: "👩‍🍳 Kurz mit der Mitarbeiterin reden (Hinweis)", next: "fastfood_hint" }
+      ]
+    },
+
+    fastfood_hint: {
+      id: "fastfood_hint",
+      title: "Taxi-Warnung",
+      location: "Schnellrestaurant",
+      chapter: "CHAPTER 2",
+      bg: "fastfood",
+      text:
+`Die Mitarbeiterin wischt den Tresen.
+
+„Wenn du hier irgendwohin musst“, sagt sie,
+„nimm nachts lieber kein zufälliges Taxi von der Straße.
+Manche fahren mit dir im Kreis, bis dein Geld weg ist.“
+
+Sie schaut kurz auf dein Handy.
+„In dieser Stadt kostet alles – auch Vertrauen.“`,
+      choices: [
+        { label: "🍟 Zurück und den Burger essen", next: "fastfood_eat" },
+        { label: "🪑 Zurück und nur warten", next: "fastfood_wait" }
+      ]
+    },
+
+    fastfood_eat: {
+      id: "fastfood_eat",
+      title: "Satt & Akku voll",
+      location: "Schnellrestaurant",
+      chapter: "CHAPTER 2",
+      bg: "fastfood",
+      text:
+`Du ziehst das Tablett zu dir.
+Der Burger ist lauwarm, die Pommes weich,
+aber dein Bauch feiert.
+
+Während du isst, klettert der Akku auf 100%.
+
+Zeit, zu checken, was passiert ist.`,
+      choices: [
+        { label: "📱 Handy checken – letzte Nachrichten", next: "messages" }
+      ]
+    },
+
+    fastfood_wait: {
+      id: "fastfood_wait",
+      title: "Nur Akku",
+      location: "Schnellrestaurant",
+      chapter: "CHAPTER 2",
+      bg: "fastfood",
+      text:
+`Du rührst das Essen nicht an.
+Du starrst auf die Akku-Anzeige:
+
+38% … 61% … 100%.
+
+Du bist hungrig, aber dein Handy ist bereit.
+
+Zeit, die Nachrichten zu checken.`,
+      choices: [
+        { label: "📱 Handy checken – letzte Nachrichten", next: "messages" }
+      ]
+    },
+
+    // HANDY & FREUND
+    messages: {
+      id: "messages",
+      title: "Letzte Nachrichten",
+      location: "Schnellrestaurant",
+      chapter: "CHAPTER 3",
+      bg: "fastfood",
+      text:
+`Du entsperrst dein Handy.
+Ganz oben: der Chat mit deinem besten Freund.
+
+„Bro, ich bin im Hotel Savoy in New York.“
+„Zimmer …“
+
+Die Nachricht bricht mitten im Satz ab.
+
+Kein „Alles gut“, kein Emoji.
+Nur dieses halbe „Zimmer …“.
+
+Du musst ihn finden.`,
+      choices: [
+        { label: "🚕 Taxi zum Hotel Savoy nehmen", next: "taxi_fail" },
+        { label: "🚶‍♂️ Zu Fuß loslaufen – Schilder suchen", next: "street" }
+      ]
+    },
+
+    taxi_fail: {
+      id: "taxi_fail",
+      title: "Falsches Taxi",
+      location: "Irgendwo in New York",
+      chapter: "GAME OVER",
+      bg: "street",
+      text:
+`Du steigst in ein Taxi.
+„Hotel Savoy“, sagst du.
+
+Der Fahrer nickt, fährt los.
+Straßen, Lichter, Kreuzungen.
+
+Nach einer Weile merkst du:
+Ihr seid schon zweimal an derselben Ecke vorbei.
+
+Als du fast kein Geld mehr hast,
+setzt er dich irgendwo ab.
+
+Kein Hotel. Kein Freund. Kein Plan.
+
+New York frisst dich, wenn du dem Falschen vertraust.`,
+      choices: [
+        { label: "🔄 Nochmal – diesmal zu Fuß gehen", next: "street" },
+        { label: "🏠 Zurück ins Hauptmenü", next: "menu" }
+      ]
+    },
+
+    // ZU FUSS
+    street: {
+      id: "street",
+      title: "Zu Fuß durch die Stadt",
+      location: "Straßen von New York",
+      chapter: "CHAPTER 3",
+      bg: "street",
+      text:
+`Du gehst zu Fuß.
+Die Luft ist kühl, Abgase, Pizza-Geruch,
+Musik aus offenen Fenstern.
+
+Nach ein paar Blocks siehst du:
+• Ein Schild: „HOTEL SAVOY →“
+• Eine kleine Seitenstraße mit Musik`,
+      choices: [
+        { label: "🎷 In die Seitenstraße (Straßenmusik)", next: "street_music" },
+        { label: "🏨 Dem Schild zum Hotel Savoy folgen", next: "hotel_lobby" }
+      ]
+    },
+
+    street_music: {
+      id: "street_music",
+      title: "Straßenmusik",
+      location: "Seitenstraße",
+      chapter: "CHAPTER 3",
+      bg: "street",
+      text:
+`In der Seitenstraße steht ein Typ mit Saxophon.
+Ein Pappbecher mit Münzen steht vor ihm.
+
+„Stressiger Tag?“, fragt er zwischen zwei Tönen.
+
+Du nickst.
+„Dann mach wenigstens eine gute Geschichte draus“,
+sagt er und spielt weiter.
+
+Du atmest einmal tief durch
+und gehst zurück auf die Hauptstraße.`,
+      choices: [
+        { label: "🏨 Zum Hotel Savoy weitergehen", next: "hotel_lobby" }
+      ]
+    },
+
+    // HOTEL
+    hotel_lobby: {
+      id: "hotel_lobby",
+      title: "Die Lobby",
+      location: "Hotel Savoy",
+      chapter: "CHAPTER 4",
+      bg: "hotel",
+      text:
+`Das Hotel Savoy glänzt.
+Marmor, Gold, zu viel Parfüm in der Luft.
+
+Du gehst zur Rezeption.
+„Ich suche meinen Freund“, sagst du
+und nennst seinen Namen.
+
+Die Rezeptionistin tippt.
+„Unter diesem Namen ist hier niemand eingecheckt“, sagt sie.
+
+Die Luft wird schwer.`,
+      choices: [
+        { label: "📞 Deinen Freund anrufen", next: "call_fail" },
+        { label: "👥 Gäste in der Lobby ansprechen", next: "guests" }
+      ]
+    },
+
+    call_fail: {
+      id: "call_fail",
+      title: "Mailbox",
+      location: "Lobby",
+      chapter: "CHAPTER 4",
+      bg: "hotel",
+      text:
+`Du wählst seine Nummer.
+Es klingelt … und klingelt …
+
+Mailbox.
+Du legst auf.
+
+Die Lobby fühlt sich größer an
+als vor wenigen Minuten.`,
+      choices: [
+        { label: "👥 Gäste in der Lobby ansprechen", next: "guests" }
+      ]
+    },
+
+    guests: {
+      id: "guests",
+      title: "Menschen im Hotel",
+      location: "Lobby",
+      chapter: "CHAPTER 4",
+      bg: "hotel",
+      text:
+`Du schaust dich um.
+
+• Ein gestresster Geschäftsmann mit Aktenkoffer.
+• Ein Hausmeister mit Werkzeugtasche.`,
+      choices: [
+        { label: "💼 Geschäftsmann ansprechen", next: "guest_business" },
+        { label: "🔧 Hausmeister ansprechen", next: "janitor_offer" }
+      ]
+    },
+
+    guest_business: {
+      id: "guest_business",
+      title: "Smalltalk",
+      location: "Lobby",
+      chapter: "CHAPTER 4",
+      bg: "hotel",
+      text:
+`„Entschuldigung“, sagst du zum Geschäftsmann,
+„haben Sie zufällig einen Typ gesehen …“ – du beschreibst deinen Freund.
+
+Er schüttelt den Kopf.
+„Ich sehe hier nur meine Termine“, sagt er.
+„Wenn du was über das Haus wissen willst:
+Frag den Hausmeister. Der kennt die Geschichten.“`,
+      choices: [
+        { label: "🔧 Hausmeister ansprechen", next: "janitor_offer" }
+      ]
+    },
+
+    janitor_offer: {
+      id: "janitor_offer",
+      title: "Der Deal",
+      location: "Lobby",
+      chapter: "CHAPTER 5",
+      bg: "hotel",
+      text:
+`Der Hausmeister mustert dich.
+„Du siehst müde aus“, sagt er,
+„aber nicht so, als hättest du hier ein Zimmer.“
+
+Du erklärst die Situation.
+Freund, Hotel, keine Buchung.
+
+Er kratzt sich am Bart.
+„Ein offizielles Zimmer kann ich dir nicht geben.
+Aber wenn du mir heute Nacht hilfst,
+kann ich dir wenigstens einen Platz zum Schlafen anbieten.“`,
+      choices: [
+        { label: "🧰 Deal annehmen und helfen", next: "janitor_work" },
+        { label: "🚪 Ablehnen und das Hotel verlassen (Game Over)", next: "hotel_leave_fail" }
+      ]
+    },
+
+    hotel_leave_fail: {
+      id: "hotel_leave_fail",
+      title: "Aus der Tür",
+      location: "Straße vor dem Hotel",
+      chapter: "GAME OVER",
+      bg: "street",
+      text:
+`Du schüttelst den Kopf.
+„Ich kann nicht mehr“, murmelst du
+und gehst nach draußen.
+
+Die Stadt rauscht.
+Lichter, Sirenen, Menschen – aber keiner ist dein Freund.
+
+Manche Geschichten enden nicht,
+weil es keinen Weg gibt,
+sondern weil einer stehen bleibt.`,
+      choices: [
+        { label: "🔄 Noch einmal in die Lobby gehen", next: "hotel_lobby" },
+        { label: "🏠 Zurück ins Hauptmenü", next: "menu" }
+      ]
+    },
+
+    janitor_work: {
+      id: "janitor_work",
+      title: "Hausmeister-Nacht",
+      location: "Flure & Zimmer",
+      chapter: "CHAPTER 5",
+      bg: "corridor",
+      text:
+`Du folgst dem Hausmeister.
+
+Stundenlang:
+Glühbirnen wechseln,
+quietschende Türen ölen,
+kleine Reparaturen.
+
+Zwischendurch sagt er:
+„Für einen Freund arbeitest du verdammt viel.“
+
+Gegen 1 Uhr:
+„Okay“, sagt er, „ich hab was im Heizungskeller.“`,
+      choices: [
+        { label: "⬇️ Mit in den Heizungskeller gehen", next: "boiler_room" }
+      ]
+    },
+
+    boiler_room: {
+      id: "boiler_room",
+      title: "Heizungskeller",
+      location: "Boilerraum",
+      chapter: "CHAPTER 6",
+      bg: "boiler",
+      text:
+`Der Heizungskeller ist warm.
+Rohre, ein alter Boiler, leises Pfeifen.
+
+In der Ecke:
+eine Matratze auf Paletten.
+
+„Ist nicht schön“, sagt der Hausmeister,
+„aber besser als nichts.
+Schlaf ein bisschen. Morgen sehen wir weiter.“`,
+      choices: [
+        { label: "😴 Hinlegen und schlafen", next: "night_wakeup" }
+      ]
+    },
+
+    night_wakeup: {
+      id: "night_wakeup",
+      title: "Schreie in der Nacht",
+      location: "Boilerraum",
+      chapter: "CHAPTER 6",
+      bg: "boiler",
+      text:
+`Du schläfst ein.
+Der Boiler brummt wie ein tiefer Bass.
+
+Eine Stunde später reißt dich Geschrei aus dem Schlaf.
+Stimmen oben im Haus, wütend, laut.
+
+„Sie haben kein Zimmer gebucht!“
+„Sie können hier nicht einfach …!“
+
+Dein Herz schlägt schneller.`,
+      choices: [
+        { label: "🙈 Ignorieren und weiter schlafen (Game Over)", next: "sleep_fail" },
+        { label: "🚶‍♂️ Aufstehen und nachsehen", next: "corridor_investigate" }
+      ]
+    },
+
+    sleep_fail: {
+      id: "sleep_fail",
+      title: "Weghören",
+      location: "Boilerraum",
+      chapter: "GAME OVER",
+      bg: "boiler",
+      text:
+`Du ziehst dir die Decke über den Kopf.
+„Nicht mein Problem“, flüsterst du.
+
+Die Stimmen werden leiser.
+Irgendwann ist es still.
+
+Am Morgen:
+Der Hausmeister ist weg.
+Die Rezeption kennt dich nicht.
+Dein Freund ist verschwunden.
+
+Manchmal ist Wegschauen die brutalste Entscheidung.`,
+      choices: [
+        { label: "🔄 Noch einmal – diesmal nachsehen", next: "corridor_investigate" },
+        { label: "🏠 Zurück ins Hauptmenü", next: "menu" }
+      ]
+    },
+
+    corridor_investigate: {
+      id: "corridor_investigate",
+      title: "Am Flur",
+      location: "Hotelflur",
+      chapter: "CHAPTER 7",
+      bg: "corridor",
+      text:
+`Du schleichst den Flur entlang.
+Gedämpftes Licht, schwerer Teppich.
+
+Am Ende: eine geöffnete Tür.
+Innen siehst du:
+
+• Deinen Kumpel
+• Den Hoteldirektor
+• Vier Security-Leute
+
+„Ihre Buchung existiert nicht“, zischt der Direktor.
+„Wer sind Sie wirklich?“`,
+      choices: [
+        { label: "😨 Dich verstecken und abwarten (Game Over)", next: "panic_fail" },
+        { label: "🕶️ Mut fassen und reingehen", next: "police_bluff" }
+      ]
+    },
+
+    panic_fail: {
+      id: "panic_fail",
+      title: "Lähmende Angst",
+      location: "Hotelflur",
+      chapter: "GAME OVER",
+      bg: "corridor",
+      text:
+`Du drückst dich in eine Nische.
+Dein Herz hämmert.
+
+Stimmen, Schritte, Türen.
+Dann Stille.
+
+Als du dich bewegst, ist der Raum leer.
+Dein Freund ist weg.
+
+Angst ist normal.
+Aber sie nimmt dir manchmal die eine Chance,
+die du gebraucht hättest.`,
+      choices: [
+        { label: "🔄 Noch einmal – diesmal mutig sein", next: "police_bluff" },
+        { label: "🏠 Zurück ins Hauptmenü", next: "menu" }
+      ]
+    },
+
+    police_bluff: {
+      id: "police_bluff",
+      title: "Der Bluff",
+      location: "Konferenzraum",
+      chapter: "CHAPTER 7",
+      bg: "corridor",
+      text:
+`Du atmest tief durch,
+setz dir deinen In-Ear-Kopfhörer ins Ohr
+und gehst einfach in den Raum.
+
+Im Gehen tippst du den Kopfhörer an:
+„Yes, I have him. Copy. I’ll bring him up.“
+
+Der Direktor starrt dich an.
+„Wer sind Sie?“`,
+      choices: [
+        { label: "🗣️ „NYPD. Ich übernehme ihn.“", next: "police_bluff_2" }
+      ]
+    },
+
+    police_bluff_2: {
+      id: "police_bluff_2",
+      title: "Übernahme",
+      location: "Konferenzraum",
+      chapter: "CHAPTER 7",
+      bg: "corridor",
+      text:
+`Du stellst dich neben deinen Freund.
+„Ich nehme ihn mit.
+Die Einheit wartet oben. Wir klären den Rest,
+ohne dass Ihr Hotel morgen in den News ist.“
+
+Du tippst noch einmal an den In-Ear:
+„Ja, ich hab ihn. Ich bring ihn euch.“
+
+Dein Freund checkt es sofort und spielt mit,
+als wärst du wirklich von der Polizei.`,
+      choices: [
+        { label: "🚶‍♂️ Freund im ‚Polizeigriff‘ rausführen", next: "escape" }
+      ]
+    },
+
+    escape: {
+      id: "escape",
+      title: "Raus aus dem Savoy",
+      location: "Straße vor dem Hotel",
+      chapter: "CHAPTER 8",
+      bg: "street",
+      text:
+`Ihr tretet auf die Straße.
+Die Hoteltür fällt hinter euch zu.
+
+Ihr löst gleichzeitig den Griff
+und fangt an zu lachen.
+
+„Alter“, sagt dein Freund,
+„das war das Dümmste und Mutigste,
+was ich seit langem gesehen habe.“`,
+      choices: [
+        { label: "🏨 Mit ihm in ein anderes Hotel gehen", next: "good_end" }
+      ]
+    },
+
+    good_end: {
+      id: "good_end",
+      title: "Der Abend danach",
+      location: "Anderes Hotel – Dachterrasse",
+      chapter: "GOOD END",
+      bg: "hotel",
+      text:
+`Später sitzt ihr auf der Dachterrasse
+eines anderen Hotels.
+
+Unter euch New York.
+Über euch der Himmel.
+
+„Weißt du noch“, sagt dein Freund,
+„wie du im Park aufgewacht bist,
+ohne Plan und ohne Akku?“
+
+Du nickst.
+„Und jetzt sitzen wir hier
+mit einer Geschichte, die uns keiner glaubt,
+aber wir wissen, dass sie stimmt.“
+
+NEW YORK CITY QUEST
+· GOOD END ·`,
+      choices: [
+        { label: "🔄 Noch mal spielen – andere Wege testen", next: "menu" }
+      ]
+    }
+  };
+
+  function renderScene(id) {
+    const scene = scenes[id];
+    if (!scene) return;
+    currentSceneId = id;
+
+    // Hintergrund
+    sceneBg.className = "scene-bg bg-" + (scene.bg || "menu");
+    sceneBg.innerHTML = "";
+    if (scene.bg === "menu") {
+      sceneBg.innerHTML = '<div class="layer-1"></div><div class="layer-2"></div><div class="layer-3"></div>';
+    } else if (scene.bg === "park") {
+      sceneBg.innerHTML = '<div class="ground"></div><div class="bench"></div><div class="tree"></div>';
+    } else if (scene.bg === "fastfood") {
+      sceneBg.innerHTML = '<div class="front"></div><div class="band"></div><div class="sign"></div>';
+    } else if (scene.bg === "library") {
+      sceneBg.innerHTML = '<div class="steps"></div><div class="columns"></div><div class="sign"></div>';
+    } else if (scene.bg === "street") {
+      sceneBg.innerHTML = '<div class="road"></div><div class="blocks"></div>';
+    } else if (scene.bg === "hotel") {
+      sceneBg.innerHTML = '<div class="facade"></div><div class="door"></div><div class="logo"></div>';
+    } else if (scene.bg === "boiler") {
+      sceneBg.innerHTML = '<div class="pipes"></div><div class="boiler"></div><div class="mattress"></div>';
+    } else if (scene.bg === "corridor") {
+      sceneBg.innerHTML = '<div class="floor"></div><div class="door d1"></div><div class="door d2"></div><div class="door d3"></div>';
+    }
+
+    // Text & Metadaten
+    sceneTitleEl.textContent = scene.title;
+    sceneLocationEl.textContent = scene.location;
+    sceneTextEl.textContent = scene.text;
+    chapterPill.textContent = scene.chapter;
+
+    // Buttons
+    choicesEl.innerHTML = "";
+    (scene.choices || []).forEach(choice => {
+      const btn = document.createElement("button");
+      btn.className = "choice-btn";
+      btn.innerHTML = `<span class="label">${choice.label}</span><span class="icon">▶</span>`;
+      btn.addEventListener("click", () => handleChoice(choice));
+      choicesEl.appendChild(btn);
+    });
+  }
+
+  function handleChoice(choice) {
+    if (choice.action === "startGame") {
+      // Beim Start direkt Musik anschmeißen
+      if (!audioCtx) {
+        initAudio();
+      }
+      if (audioCtx) {
+        audioCtx.resume && audioCtx.resume();
+        startMusic();
+      }
+      renderScene("park");
+      return;
+    }
+
+    if (choice.action === "toggleMusicOnly") {
+      toggleMusic();
+      return;
+    }
+
+    if (choice.next) {
+      renderScene(choice.next);
+    }
+  }
+
+  // Start im Menü
+  renderScene("menu");
 </script>
 </body>
 </html>
