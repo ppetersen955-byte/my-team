@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>NEW YORK CITY QUEST – Intro</title>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+
+  <style>
+    :root {
+      --bg: #020617;
+      --bg2: #0b1120;
+      --card: #020617;
+      --accent1: #22c55e;  /* grün */
+      --accent2: #fb923c;  /* orange */
+      --accent3: #38bdf8;  /* blau */
+      --txt-main: #e5e7eb;
+      --txt-muted: #9ca3af;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at top, #1e293b 0, #020617 50%, #000 100%);
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-text-size-adjust: 100%;
+      color: var(--txt-main);
+      overscroll-behavior: none;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 12px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 10px;
+      height: 100vh;
+    }
+
+    .title-bar {
+      text-align: center;
+      font-size: 12px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--txt-muted);
+    }
+
+    .card {
+      flex: 1;
+      background:
+        linear-gradient(145deg, rgba(15,23,42,0.95), rgba(2,6,23,0.98));
+      border-radius: 18px;
+      border: 1px solid #111827;
+      box-shadow:
+        0 18px 40px rgba(0,0,0,0.8),
+        inset 0 0 0 1px rgba(148,163,184,0.1);
+      padding: 12px 12px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Pixel-Rand / Rahmen */
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border-radius: 10px;
+      border: 2px solid rgba(56,189,248,0.18);
+      box-shadow:
+        0 0 0 1px rgba(15,23,42,0.8),
+        0 0 16px rgba(56,189,248,0.12);
+      pointer-events: none;
+    }
+
+    .card-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      height: 100%;
+    }
+
+    .headline {
+      text-align: center;
+    }
+
+    .game-title {
+      font-family: "Courier New", monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 18px;
+      margin-bottom: 2px;
+      text-shadow:
+        0 0 2px #000,
+        0 0 6px #000,
+        2px 2px 0 #000;
+    }
+
+    .game-sub {
+      font-family: "Courier New", monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--txt-muted);
+    }
+
+    .pixel-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 4px 2px 0;
+    }
+
+    /* Pixel-Skyline */
+    .skyline {
+      width: 100%;
+      max-width: 340px;
+      margin: 0 auto;
+      height: 120px;
+      position: relative;
+      image-rendering: pixelated;
+    }
+
+    .sky-layer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    .sky-grad {
+      top: 0;
+      height: 100%;
+      background:
+        radial-gradient(circle at top, #38bdf8 0, #1e293b 40%, #020617 100%);
+      opacity: 0.65;
+    }
+
+    .buildings-back {
+      height: 50px;
+      background:
+        repeating-linear-gradient(
+          to right,
+          #020617,
+          #020617 6px,
+          #0b1120 6px,
+          #0b1120 12px
+        );
+      opacity: 0.9;
+    }
+
+    .buildings-mid {
+      height: 75px;
+      background:
+        repeating-linear-gradient(
+          to right,
+          #020617,
+          #020617 10px,
+          #111827 10px,
+          #111827 20px
+        );
+      clip-path: polygon(
+        0 40%, 8% 5%, 16% 40%, 23% 10%, 30% 50%,
+        40% 15%, 50% 55%, 60% 8%, 70% 45%, 80% 15%,
+        88% 45%, 100% 20%, 100% 100%, 0 100%
+      );
+    }
+
+    .buildings-front {
+      height: 38px;
+      background:
+        repeating-linear-gradient(
+          to right,
+          #020617,
+          #020617 12px,
+          #0f172a 12px,
+          #0f172a 24px
+        );
+    }
+
+    .windows {
+      position: absolute;
+      inset: auto 0 10px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      gap: 2px;
+      pointer-events: none;
+    }
+
+    .window-row {
+      height: 100%;
+      display: flex;
+      gap: 2px;
+      align-items: flex-end;
+    }
+
+    .win {
+      width: 3px;
+      height: 4px;
+      background: var(--accent2);
+      box-shadow:
+        0 0 4px rgba(251,146,60,0.8);
+    }
+
+    .win.blue {
+      background: var(--accent3);
+      box-shadow:
+        0 0 4px rgba(56,189,248,0.9);
+    }
+
+    .win.green {
+      background: var(--accent1);
+      box-shadow:
+        0 0 4px rgba(34,197,94,0.9);
+    }
+
+    .intro-text {
+      font-family: "Courier New", monospace;
+      font-size: 12px;
+      text-align: center;
+      white-space: pre-wrap;
+      line-height: 1.4;
+      color: var(--txt-main);
+      padding: 0 4px;
+    }
+
+    .press-start {
+      margin-top: 4px;
+      font-family: "Courier New", monospace;
+      font-size: 12px;
+      text-align: center;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent1);
+      text-shadow: 0 0 5px #000;
+      animation: blink 0.85s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    .status-line {
+      margin-top: 4px;
+      font-size: 11px;
+      text-align: center;
+      color: var(--txt-muted);
+    }
+
+    .bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--txt-muted);
+      padding: 0 4px;
+    }
+
+    .chip {
+      font-family: "Courier New", monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      padding: 3px 10px;
+      background: rgba(15,23,42,0.9);
+    }
+
+    .sound-indicator {
+      font-family: "Courier New", monospace;
+      font-size: 10px;
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #ef4444;
+      box-shadow: 0 0 6px rgba(239,68,68,0.8);
+    }
+
+    .dot.on {
+      background: #22c55e;
+      box-shadow: 0 0 6px rgba(34,197,94,0.8);
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 10px;
+      color: var(--txt-muted);
+    }
+
+    button {
+      font-size: 16px; /* vermeidet Zoom auf iOS beim Tippen */
+    }
+  </style>
+</head>
+<body>
+<div class="app" id="tap-area">
+  <div class="title-bar">PIXEL · STORY · NEW YORK</div>
+
+  <div class="card">
+    <div class="card-inner">
+      <div class="headline">
+        <div class="game-title">NEW YORK CITY QUEST</div>
+        <div class="game-sub">interaktives 90er-pixel-abenteuer</div>
+      </div>
+
+      <div class="pixel-stage">
+        <div class="skyline">
+          <div class="sky-layer sky-grad"></div>
+          <div class="sky-layer buildings-back"></div>
+          <div class="sky-layer buildings-mid"></div>
+          <div class="sky-layer buildings-front"></div>
+
+          <!-- ein paar leuchtende Fenster -->
+          <div class="windows">
+            <div class="window-row">
+              <div class="win"></div>
+              <div class="win blue"></div>
+              <div class="win"></div>
+              <div class="win green"></div>
+              <div class="win"></div>
+              <div class="win blue"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="intro-text" id="intro-text">
+Du sitzt auf einer Bank im Central Park.
+Die Stadt rauscht, irgendwo hupt ein Taxi.
+
+Heute beginnt dein persönliches New-York-Quest.
+Tippe einmal auf den Bildschirm,
+um den 8-Bit-Sound zu aktivieren
+und das Intro zu starten.
+        </div>
+
+        <div>
+          <div class="press-start" id="press-start">▶ PRESS START</div>
+          <div class="status-line" id="status-line">
+1. Tippe einmal, um Sound zu aktivieren · 2. Tippe noch mal, um weiterzugehen
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-row">
+        <div class="chip">chapter 0 · intro</div>
+        <div class="sound-indicator">
+          <div class="dot" id="sound-dot"></div>
+          <span id="sound-label">Sound: AUS</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Nächster Schritt: Kapitel 1 – Central Park als eigene Datei (nyc-quest-1.html)
+  </div>
+</div>
+
+<script>
+  let audioCtx = null;
+  let isMusicOn = false;
+  let loopInterval = null;
+  let introPhase = 0; // 0 = noch nichts, 1 = Sound läuft, 2 = später: weiterleiten
+
+  const soundDot = document.getElementById("sound-dot");
+  const soundLabel = document.getElementById("sound-label");
+  const statusLine = document.getElementById("status-line");
+  const introTextEl = document.getElementById("intro-text");
+  const pressStartEl = document.getElementById("press-start");
+  const tapArea = document.getElementById("tap-area");
+
+  function start8BitLoop() {
+    if (isMusicOn) return;
+
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) {
+      statusLine.textContent = "Dein Browser unterstützt leider keinen Web-Audio-Sound.";
+      return;
+    }
+
+    audioCtx = new AudioContext();
+    isMusicOn = true;
+
+    soundDot.classList.add("on");
+    soundLabel.textContent = "Sound: AN";
+
+    // Einfaches 8-Bit-Motiv: C–E–G–C
+    const notes = [261.63, 329.63, 392.00, 523.25];
+    let step = 0;
+
+    loopInterval = setInterval(() => {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = "square";
+      osc.frequency.value = notes[step % notes.length];
+
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.25);
+
+      step++;
+    }, 260);
+  }
+
+  function stop8BitLoop() {
+    if (loopInterval) clearInterval(loopInterval);
+    loopInterval = null;
+    isMusicOn = false;
+    soundDot.classList.remove("on");
+    soundLabel.textContent = "Sound: AUS";
+  }
+
+  function handleTap() {
+    if (introPhase === 0) {
+      // Erster Tap: Sound an + Text ändern
+      start8BitLoop();
+      introPhase = 1;
+      introTextEl.textContent =
+"Kapitel 1 – Central Park\n\n" +
+"Dies ist nur das Intro. Im nächsten Schritt bauen wir\n" +
+"eine eigene Datei (nyc-quest-1.html), in der du\n" +
+"durch New York läufst, Entscheidungen triffst\n" +
+"und deinen Freund im Diner triffst.\n\n" +
+"Tippe noch einmal, um symbolisch ins nächste Kapitel\n" +
+"zu springen.";
+      statusLine.textContent = "Sound läuft. Tippe noch einmal, um weiterzugehen.";
+      pressStartEl.textContent = "▶ TAP FÜR KAPITEL 1";
+    } else if (introPhase === 1) {
+      // Zweiter Tap: hier später Weiterleitung
+      introPhase = 2;
+      statusLine.textContent = "Hier verlinken wir später auf: nyc-quest-1.html";
+      introTextEl.textContent =
+"Stell dir vor, jetzt öffnet sich Kapitel 1:\n" +
+"Du in New York. Park, Subway, Diner, Boiler-Raum.\n\n" +
+"Beim nächsten Bauen erstellen wir die Datei:\n" +
+"nyc-quest-1.html\n" +
+"und lassen dich dort richtig loslaufen.";
+      pressStartEl.textContent = "COMING SOON · KAPITEL 1";
+    } else {
+      // weitere Taps: optional Sound an/aus
+      if (isMusicOn) {
+        stop8BitLoop();
+        statusLine.textContent = "Sound gestoppt. Tippe, um ihn wieder zu starten.";
+      } else {
+        start8BitLoop();
+        statusLine.textContent = "Sound wieder an.";
+      }
+    }
+  }
+
+  tapArea.addEventListener("click", handleTap);
+  tapArea.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    handleTap();
+  }, { passive: false });
+</script>
+</body>
+</html>
