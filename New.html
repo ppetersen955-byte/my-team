@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>NEW YORK CITY QUEST – Intro</title>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+
+  <style>
+    :root {
+      --shell: #d4d4d4;
+      --shell-dark: #a3a3a3;
+      --screen-bg: #0f172a;
+      --screen-mid: #111827;
+      --screen-light: #1f2937;
+      --accent: #f97316;
+      --accent2: #22c55e;
+      --accent3: #38bdf8;
+      --txt-main: #e5e7eb;
+      --txt-muted: #9ca3af;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at top, #1e293b 0, #020617 45%, #000 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    .wrapper {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 8px;
+    }
+
+    .shell {
+      width: min(460px, 100%);
+      aspect-ratio: 3 / 5;
+      border-radius: 26px 26px 70px 26px;
+      background: linear-gradient(145deg, var(--shell) 0, #f9fafb 40%, var(--shell-dark) 100%);
+      box-shadow:
+        0 24px 50px rgba(0,0,0,0.8),
+        inset 0 0 14px rgba(255,255,255,0.6);
+      padding: 12px 10px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .shell-header {
+      text-align: center;
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #4b5563;
+      margin-bottom: 4px;
+    }
+
+    .crt-frame {
+      flex: 1;
+      border-radius: 20px;
+      padding: 10px;
+      background:
+        radial-gradient(circle at top, #0b1120 0, #020617 45%, #000 100%);
+      box-shadow:
+        inset 0 0 22px rgba(0,0,0,0.9),
+        0 0 0 1px #020617;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .crt-screen {
+      flex: 1;
+      border-radius: 12px;
+      background:
+        radial-gradient(circle at center,
+          #111827 0,
+          #020617 50%,
+          #000000 100%);
+      box-shadow:
+        inset 0 0 18px rgba(0,0,0,0.8),
+        0 0 0 1px rgba(15,23,42,0.9);
+      padding: 10px 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Fake Scanlines */
+    .crt-screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(
+        rgba(0,0,0,0.25) 1px,
+        transparent 1px
+      );
+      background-size: 100% 3px;
+      mix-blend-mode: soft-light;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .crt-inner {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .pixel-title {
+      text-align: center;
+      font-family: "Courier New", monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 16px;
+      margin-bottom: 4px;
+      color: var(--txt-main);
+      text-shadow:
+        0 0 3px #000,
+        0 0 6px #000,
+        2px 2px 0 #000;
+      transform: scale(1.02);
+    }
+
+    .pixel-sub {
+      text-align: center;
+      font-family: "Courier New", monospace;
+      font-size: 10px;
+      color: var(--txt-muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .pixel-city {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .skyline {
+      width: 100%;
+      max-width: 260px;
+      height: 90px;
+      position: relative;
+      image-rendering: pixelated;
+    }
+
+    .skyline-layer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+
+    .layer-back {
+      height: 40px;
+      background:
+        repeating-linear-gradient(
+          to right,
+          #111827,
+          #111827 6px,
+          #020617 6px,
+          #020617 12px
+        );
+      opacity: 0.7;
+    }
+
+    .layer-mid {
+      height: 55px;
+      background:
+        repeating-linear-gradient(
+          to right,
+          #1f2937,
+          #1f2937 8px,
+          #020617 8px,
+          #020617 16px
+        );
+      clip-path: polygon(0 40%, 15% 0, 25% 30%, 35% 10%, 50% 45%, 65% 5%, 78% 30%, 100% 15%, 100% 100%, 0 100%);
+      opacity: 0.88;
+    }
+
+    .layer-front {
+      height: 30px;
+      background:
+        repeating-linear-gradient(
+          to right,
+          #0f172a,
+          #0f172a 10px,
+          #020617 10px,
+          #020617 20px
+        );
+      opacity: 1;
+    }
+
+    .pixel-text {
+      font-family: "Courier New", monospace;
+      font-size: 11px;
+      color: #e5e7eb;
+      text-align: center;
+      white-space: pre-wrap;
+      line-height: 1.4;
+      padding: 0 4px;
+    }
+
+    .press-start {
+      margin-top: 4px;
+      font-family: "Courier New", monospace;
+      font-size: 11px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--accent2);
+      text-shadow: 0 0 4px #000;
+    }
+
+    .press-start.hidden {
+      opacity: 0;
+    }
+
+    .status-line {
+      margin-top: 4px;
+      font-family: "Courier New", monospace;
+      font-size: 9px;
+      text-align: center;
+      color: var(--txt-muted);
+    }
+
+    .shell-bottom {
+      margin-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 0 6px;
+    }
+
+    .dpad {
+      width: 68px;
+      height: 68px;
+      position: relative;
+    }
+
+    .dpad::before,
+    .dpad::after {
+      content: "";
+      position: absolute;
+      background: #111827;
+      border-radius: 6px;
+      box-shadow: 0 3px 0 #020617;
+    }
+
+    .dpad::before {
+      top: 24px;
+      left: 8px;
+      right: 8px;
+      height: 18px;
+    }
+
+    .dpad::after {
+      left: 24px;
+      top: 8px;
+      bottom: 8px;
+      width: 18px;
+    }
+
+    .ab-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .ab-buttons {
+      display: flex;
+      gap: 10px;
+      transform: translateX(6px);
+    }
+
+    .ab-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      background: #b91c1c;
+      box-shadow: 0 3px 0 #450a0a;
+    }
+
+    .ab-labels {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: #4b5563;
+    }
+
+    @media (max-height: 640px) {
+      .shell {
+        height: 100%;
+        width: auto;
+        aspect-ratio: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="shell" id="start-area">
+    <div class="shell-header">PIXEL · STORY · ADVENTURE</div>
+
+    <div class="crt-frame">
+      <div class="crt-screen">
+        <div class="crt-inner">
+          <div>
+            <div class="pixel-title">NEW YORK CITY QUEST</div>
+            <div class="pixel-sub">ein interaktives 90er-jahre-pixel-abenteuer</div>
+          </div>
+
+          <div class="pixel-city">
+            <div class="skyline">
+              <div class="skyline-layer layer-back"></div>
+              <div class="skyline-layer layer-mid"></div>
+              <div class="skyline-layer layer-front"></div>
+            </div>
+            <div class="pixel-text" id="intro-text">
+Du sitzt auf einer Bank im Central Park.
+Die Stadt rauscht. Ein neuer Tag in New York City.
+
+Gleich beginnt dein persönliches Quest.
+Tippe auf den Bildschirm, um zu starten.
+            </div>
+          </div>
+
+          <div>
+            <div class="press-start" id="press-start">▶ PRESS START</div>
+            <div class="status-line" id="status-line">
+Sound: tippe einmal, um den 8-Bit-Sound zu aktivieren.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="shell-bottom">
+      <div class="dpad"></div>
+      <div class="ab-group">
+        <div class="ab-buttons">
+          <div class="ab-btn"></div>
+          <div class="ab-btn"></div>
+        </div>
+        <div class="ab-labels">A · B · START</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // --- Einfacher 8-Bit-Sound mit Web Audio API ------------------------
+  let audioCtx = null;
+  let musicInterval = null;
+  let isMusicOn = false;
+
+  function startMusic() {
+    if (isMusicOn) return;
+
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) {
+      console.warn("Web Audio wird nicht unterstützt.");
+      return;
+    }
+
+    audioCtx = new AudioContext();
+    isMusicOn = true;
+
+    const notes = [261.63, 329.63, 392.00, 523.25]; // C-E-G-C
+    let step = 0;
+
+    musicInterval = setInterval(() => {
+      if (!audioCtx) return;
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = "square";
+      osc.frequency.value = notes[step % notes.length];
+
+      const now = audioCtx.currentTime;
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.26);
+
+      step++;
+    }, 280);
+  }
+
+  function stopMusic() {
+    if (musicInterval) clearInterval(musicInterval);
+    musicInterval = null;
+    if (audioCtx) {
+      // nicht komplett schließen, sonst meckert iOS oft
+    }
+    isMusicOn = false;
+  }
+
+  // --- UI-Logik: Press Start blinkt & Start-Tap -----------------------
+  const pressStartEl = document.getElementById("press-start");
+  const statusLineEl = document.getElementById("status-line");
+  const startArea = document.getElementById("start-area");
+  const introTextEl = document.getElementById("intro-text");
+
+  let blinkOn = true;
+  setInterval(() => {
+    blinkOn = !blinkOn;
+    pressStartEl.classList.toggle("hidden", !blinkOn);
+  }, 600);
+
+  let introClicked = false;
+
+  function handleStartTap() {
+    if (!introClicked) {
+      introClicked = true;
+      startMusic();
+      statusLineEl.textContent = "Sound aktiviert. (Lautstärke am Gerät regeln.)";
+
+      introTextEl.textContent =
+"Kapitel 1 – Central Park\n\n" +
+"Dies ist nur das Intro.\n" +
+"Als Nächstes hängen wir hier die erste richtige Szene dran:\n" +
+"Entscheidungen, Dialoge, kleine Quests in NYC.\n\n" +
+"Du bist bereit. New York auch.";
+
+      pressStartEl.textContent = "COMING SOON · TAP FÜR NÄCHSTEN SCHRITT";
+    } else {
+      // später: hier leiten wir zur eigentlichen Spielseite weiter,
+      // z.B. window.location.href = "nyc-quest.html";
+      statusLineEl.textContent = "Hier könnten wir jetzt ins eigentliche Quest springen. 🙂";
+    }
+  }
+
+  startArea.addEventListener("click", handleStartTap);
+  startArea.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    handleStartTap();
+  }, { passive: false });
+</script>
+</body>
+</html>
